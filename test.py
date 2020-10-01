@@ -1,31 +1,33 @@
-
-# create dictionary with each word and nr. of occurences
-
 from bs4 import BeautifulSoup
-import string
+from nltk.tokenize import word_tokenize
 
 # Load text
 filename = './text/AA/wiki_00'
-file = open(filename, 'rt')
+file = open(filename, 'rt', encoding='utf8')
 text = file.read()
 file.close()
 
 # Clean XML tags
 cleantext = BeautifulSoup(text, "lxml").text
 
-# Split into words by white space
-words = cleantext.split()
+tokens = word_tokenize(cleantext)
+# remove all tokens that are not alphabetic (fx. “armour-like” and “‘s”)
+words = [word.lower() for word in tokens if word.isalpha()]
+#print(words[:100])
 
-# Remove punctuation from each word
-table = str.maketrans('', '', string.punctuation)
-stripped = [w.translate(table) for w in words]
-#print(stripped[:100])
-
-my_dict = dict()
-for word in stripped:
-	if word in my_dict.keys():
-		my_dict[word] += 1
+frequency_dict = dict()
+for word in words:
+	if word in frequency_dict.keys():
+		frequency_dict[word] += 1
 	else:
-		my_dict[word] = 1
+		frequency_dict[word] = 1
 
-print(my_dict['The'])
+nr_of_tokens = sum(frequency_dict.values())
+
+probability_dict = dict()
+for k, v in frequency_dict.items():
+	probability_dict[k] = v / nr_of_tokens
+
+print(nr_of_tokens)
+print(frequency_dict['the'])
+print(probability_dict['the'])
