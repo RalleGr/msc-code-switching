@@ -6,6 +6,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 
+
 # Get dictionaries
 probability_en_df = pd.read_csv('probability_dict_en.csv')
 probability_en_dict = probability_en_df.set_index('word')['probability'].to_dict()
@@ -20,7 +21,7 @@ words = []
 t = []
 for line in file:
 	# Remove empty lines, lines starting with #, \n and split on tab
-	if (line.strip() is not '' and line[0] is not '#'):
+	if (line.strip() is not '' and '# sent_enum' not in line):
 		line = line.rstrip('\n')
 		splits = line.split("\t")
 		words.append(splits[0])
@@ -61,7 +62,7 @@ for word in words:
 acc = accuracy_score(t, y)
 print(acc)
 # 0.6959812854571735
-# 0.7784090222778756
+# 0.7643007491479774
 
 # Fq score
 f1 = f1_score(t, y, average=None)
@@ -71,4 +72,5 @@ print(f1)
 conf_matrix = confusion_matrix(t, y)
 classes = ['ambiguous', 'fw', 'lang1', 'lang2', 'mixed', 'ne', 'other', 'unk']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot()
-plt.show()
+plt.savefig("confusion_matrix.png")
+
