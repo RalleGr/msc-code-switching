@@ -13,7 +13,7 @@ import csv
 ## es_core_news_md
 ## es_core_news_lg
 
-def get_frequency_dict(lang,model):
+def get_frequency_dict(lang, model):
 	frequency_dict = dict()
 	other_dict = dict()
 
@@ -43,15 +43,15 @@ def get_frequency_dict(lang,model):
 
 			for word in tokens:
 				if word.is_punct or word.is_digit or word.pos_ == 'SYM':
-					if word in other_dict.keys():
-						other_dict[word] += 1
+					if word.text in other_dict.keys():
+						other_dict[word.text] += 1
 					else:
-						other_dict[word] = 1
+						other_dict[word.text] = 1
 				else:
-					if word.lower in frequency_dict.keys():
-						frequency_dict[word.lower] += 1
+					if word.text.lower() in frequency_dict.keys():
+						frequency_dict[word.text.lower()] += 1
 					else:
-						frequency_dict[word.lower] = 1
+						frequency_dict[word.text.lower()] = 1
 
 	return frequency_dict, other_dict
 
@@ -77,8 +77,8 @@ def write_dict(frequency_dict, lang, probability_dict=None):
 
 # Python code to merge dict using update() method
 def merge(dict1, dict2):
-	return(dict2.update(dict1))
-
+	dict2.update(dict1)
+	return dict2
 
 # Dictionaries for English
 frequency_dict_en, other_dict_en = get_frequency_dict('en', 'en_core_web_sm')
