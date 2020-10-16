@@ -1,5 +1,4 @@
 from bs4 import BeautifulSoup
-from nltk.tokenize import word_tokenize
 import spacy
 import os
 import csv
