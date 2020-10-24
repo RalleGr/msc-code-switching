@@ -6,15 +6,16 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 
+DICTIONARIES_PATH = "./dictionaries/"
 
 # Get dictionaries
-probability_en_df = pd.read_csv('probability_dict_en.csv')
+probability_en_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_en.csv')
 probability_en_dict = probability_en_df.set_index('word')['probability'].to_dict()
 
-probability_es_df = pd.read_csv('probability_dict_es.csv')
+probability_es_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_es.csv')
 probability_es_dict = probability_es_df.set_index('word')['probability'].to_dict()
 
-probability_other_df = pd.read_csv('probability_dict_other.csv')
+probability_other_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_other.csv')
 probability_other_dict = probability_other_df.set_index('word')['probability'].to_dict()
 
 # Get data
