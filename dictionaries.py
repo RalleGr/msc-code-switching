@@ -123,6 +123,7 @@ frequency_dict_es, other_dict_es = get_frequency_dict('es')
 probability_dict_es = get_probability_dict(frequency_dict_es)
 write_dict(frequency_dict_es, 'es', probability_dict_es)
 
+# Dictionaries for other clas
 other_dict = merge(other_dict_en, other_dict_es)
 probability_dict_other = get_probability_dict(other_dict)
 write_dict(other_dict,'other')
