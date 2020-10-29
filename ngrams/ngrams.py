@@ -39,8 +39,8 @@ class NGramModel:
 						bigrams.append(ngram)
 		return unigrams + bigrams
 	
-	def load_ngrams_freq(self, ngrams):
-		self.freq_dist = FreqDist(ngrams)
+	def load_ngrams_freq(self, freq_dist):
+		self.freq_dist = freq_dist
 
 	def get_word_log_prob(self, word):
 		word_log_prob = 0

@@ -6,26 +6,9 @@ import os
 import emoji
 import string
 from tools.utils import write_dict
+from tools.utils import is_other
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
-
-# Punctuation, Numbers and Emojis
-def is_other(word):
-	def isfloat(value):
-		try:
-			float(value)
-			return True
-		except ValueError:
-			return False
-
-	if word in emoji.UNICODE_EMOJI or word.isnumeric() or isfloat(word):
-		return True
-
-	for c in word:
-		if c not in string.punctuation:
-			return False
-	return True
-
 
 def get_frequency_dict(lang):
 	frequency_dict = dict()
