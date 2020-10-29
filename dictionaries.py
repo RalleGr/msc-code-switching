@@ -4,19 +4,10 @@ from spacy.lang.en import English
 from spacy.lang.es import Spanish
 import os
 import emoji
-import csv
 import string
+from tools.utils import write_dict
 
-# MODEL SIZES
-## ENGLISH
-## en_core_web_sm
-## 
-## SPANISH
-## es_core_news_sm
-## es_core_news_md
-## es_core_news_lg
-
-DICTIONARIES_PATH = "./dictionaries/"
+WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
 # Punctuation, Numbers and Emojis
 def is_other(word):
@@ -41,7 +32,7 @@ def get_frequency_dict(lang):
 	other_dict = dict()
 
 	# Load data
-	for root, dirs, files in os.walk('monolingual-' + lang):
+	for root, dirs, files in os.walk('datasets/monolingual-' + lang):
 		if ('.DS_Store' in files):
 			files.remove('.DS_Store')
 		for f in files:
@@ -54,28 +45,13 @@ def get_frequency_dict(lang):
 			# Clean XML tags
 			cleantext = BeautifulSoup(text, "lxml").text
 
-			# tokens = word_tokenize(cleantext)
-
-			# nlp = spacy.load(model)
-			# nlp.max_length = 1500000
-			# tokens = nlp(cleantext)
-
 			nlp = English() if lang is 'en' else Spanish()
 			tokenizer = nlp.Defaults.create_tokenizer(nlp)
 			tokens = list(tokenizer(cleantext))
 
-			# print(True if "don't" in (w.text for w in s) else False)
-
-
-			# remove all tokens that are not alphabetic (fx. “armour-like” and “‘s”)
-			# TODO this needs some more fine-grained preprocessing
-			# words = [word.lower for word in tokens]
-			# print(words[:100])
-
 			for word in tokens:
 				word = word.text.lower()
 				if is_other(word):
-				# if word.is_punct or word.is_digit or word.pos_ == 'SYM':
 					if word in other_dict.keys():
 						other_dict[word] += 1
 					else:
@@ -95,19 +71,6 @@ def get_probability_dict(frequency_dict):
 		probability_dict[k] = v / nr_of_tokens
 	return probability_dict
 
-
-def write_dict(frequency_dict, lang, probability_dict=None):
-	frequency_dict_csv = csv.writer(open(DICTIONARIES_PATH+'frequency_dict_' + lang + '.csv', 'w',encoding='UTF-16'))
-	frequency_dict_csv.writerow(['word', 'frequency'])
-	for key, val in frequency_dict.items():
-		frequency_dict_csv.writerow([key, val])
-
-	if probability_dict is not None:
-		probability_dict_csv = csv.writer(open(DICTIONARIES_PATH +'probability_dict_' + lang + '.csv', 'w',encoding='UTF-16'))
-		probability_dict_csv.writerow(['word', 'probability'])
-		for key, val in probability_dict.items():
-			probability_dict_csv.writerow([key, val])
-
 # Python code to merge dict using update() method
 def merge(dict1, dict2):
 	dict2.update(dict1)
@@ -116,15 +79,15 @@ def merge(dict1, dict2):
 # Dictionaries for English
 frequency_dict_en, other_dict_en = get_frequency_dict('en')
 probability_dict_en = get_probability_dict(frequency_dict_en)
-write_dict(frequency_dict_en, 'en', probability_dict_en)
+write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_dict_en, 'en', probability_dict_en)
 
 # Dictionaries for Spanish
 frequency_dict_es, other_dict_es = get_frequency_dict('es')
 probability_dict_es = get_probability_dict(frequency_dict_es)
-write_dict(frequency_dict_es, 'es', probability_dict_es)
+write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_dict_es, 'es', probability_dict_es)
 
-# Dictionaries for other clas
+# Dictionaries for other class
 other_dict = merge(other_dict_en, other_dict_es)
 probability_dict_other = get_probability_dict(other_dict)
-write_dict(other_dict,'other')
+write_dict(WORD_LEVEL_DICTIONARIES_PATH, other_dict, 'other')
 

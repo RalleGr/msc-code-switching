@@ -6,7 +6,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 
-DICTIONARIES_PATH = "./dictionaries/"
+DICTIONARIES_PATH = "./dictionaries/word-level/"
 
 # Get dictionaries
 probability_en_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_en.csv', encoding='utf-16')
@@ -19,7 +19,7 @@ probability_other_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_other.csv
 probability_other_dict = probability_other_df.set_index('word')['probability'].to_dict()
 
 # Get data
-filepath = 'bilingual-annotated/train.conll' # TODO use dev instead?
+filepath = 'datasets/bilingual-annotated/test.conll'
 file = open(filepath, 'rt', encoding='utf8')
 words = []
 t = []
