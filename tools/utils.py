@@ -26,7 +26,10 @@ def is_other(word):
 	if word in emoji.UNICODE_EMOJI or word.isnumeric() or isfloat(word):
 		return True
 
+	if '\n' in word:
+		return True
+		
 	for c in word:
-		if c not in string.punctuation:
-			return False
-	return True
+		if c in string.punctuation and c is not "\'":
+			return True
+	return False

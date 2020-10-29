@@ -34,6 +34,7 @@ def get_frequency_dict(lang):
 
 			for word in tokens:
 				word = word.text.lower()
+
 				if is_other(word):
 					if word in other_dict.keys():
 						other_dict[word] += 1
