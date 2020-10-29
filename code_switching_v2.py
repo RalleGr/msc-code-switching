@@ -47,15 +47,12 @@ y = []
 counter = 0
 print("Classifying...")
 for word in words:
+	word = word.lower()
 	if is_other(word):
 		lang = 'other'
 	else:
 		prob_en = model_en.get_word_log_prob(word)
 		prob_es = model_es.get_word_log_prob(word)
-		if counter % 10000 == 0:
-			print(prob_en)
-			print(prob_es)
-			print(f"{counter} of {len(words)}")
 		if (prob_en >= prob_es):
 			lang = 'lang1'
 		else:
@@ -63,7 +60,8 @@ for word in words:
 	
 	y.append(lang)
 
-
+	if counter % 10000 == 0:
+		print(f"{counter} of {len(words)}")
 	counter+=1
 
 # Get accuracy

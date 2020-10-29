@@ -35,6 +35,7 @@ file.close()
 # Choose language with highest probability for each word
 y = []
 for word in words:
+	word = word.lower()
 	if word in probability_en_dict:
 		prob_en = probability_en_dict[word]
 	else:

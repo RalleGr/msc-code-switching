@@ -17,11 +17,14 @@ frequency_other_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH+'frequency_dict_ot
 frequency_other_dict = frequency_other_df.set_index('word')['frequency'].to_dict()
 
 # Create ngrams frequency dictionaries
-model_en = NGramModel().train(frequency_en_dict)
+model_en = NGramModel()
+model_en.train(frequency_en_dict)
 write_dict(CHAR_LEVEL_DICTIONARIES_PATH, model_en.freq_dist, 'en')
 
-model_es = NGramModel().train(frequency_es_dict)
+model_es = NGramModel()
+model_es.train(frequency_es_dict)
 write_dict(CHAR_LEVEL_DICTIONARIES_PATH, model_es.freq_dist, 'es')
 
-model_other = NGramModel().train(frequency_other_dict)
+model_other = NGramModel()
+model_other.train(frequency_other_dict)
 write_dict(CHAR_LEVEL_DICTIONARIES_PATH, model_other.freq_dist, 'other')

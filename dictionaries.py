@@ -1,10 +1,7 @@
 from bs4 import BeautifulSoup
-import spacy
 from spacy.lang.en import English
 from spacy.lang.es import Spanish
 import os
-import emoji
-import string
 from tools.utils import write_dict
 from tools.utils import is_other
 
