@@ -6,9 +6,14 @@ from nltk.lm.preprocessing import flatten
 import numpy as np
 
 class NGramModel:
-	def __init__(self, tokens_dict):
-		self.tokens_dict = tokens_dict
+	def __init__(self):
+		self.tokens_dict = dict()
 		self.freq_dist = FreqDist()
+	
+	def train(self, tokens_dict):
+		self.tokens_dict = tokens_dict
+		ngrams = self.get_ngrams()
+		self.freq_dist = FreqDist(ngrams)
 
 	def get_freq(self, ngram):
 		if (self.freq_dist.get(ngram) is None):
@@ -34,7 +39,7 @@ class NGramModel:
 						bigrams.append(ngram)
 		return unigrams + bigrams
 	
-	def set_freq_dist(self, ngrams):
+	def load_ngrams_freq(self, ngrams):
 		self.freq_dist = FreqDist(ngrams)
 
 	def get_word_log_prob(self, word):
