@@ -67,6 +67,7 @@ for word in words:
 acc = accuracy_score(t, y)
 print(acc)
 # 0.3306321355653757 # first try with unigrams and bigrams
+# 0.7512812260156966 # after fixing bug
 
 # Fq score
 f1 = f1_score(t, y, average=None)
