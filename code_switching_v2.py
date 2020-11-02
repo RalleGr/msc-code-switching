@@ -10,20 +10,23 @@ from tools.utils import is_other
 
 CHAR_LEVEL_DICTIONARIES_PATH = "./dictionaries/character-level/"
 
+# n = 2
+n = 3
+
 # Get dictionaries
 print("Getting dictionaries...")
-frequency_en_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH+'frequency_dict_en.csv',encoding='utf-16', converters={"word": ast.literal_eval})
+frequency_en_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_dict_en.csv', encoding='utf-16', converters={"word": ast.literal_eval})
 frequency_en_dict = frequency_en_df.set_index('word')['frequency'].to_dict()
 
-frequency_es_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH+'frequency_dict_es.csv',encoding='utf-16', converters={"word": ast.literal_eval})
+frequency_es_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_dict_es.csv', encoding='utf-16', converters={"word": ast.literal_eval})
 frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
 
 # Apply ngram model to en, es and other
 print("Applying NGRAM model...")
-model_en = NGramModel()
+model_en = NGramModel(n)
 model_en.load_ngrams_freq(frequency_en_dict)
 
-model_es = NGramModel()
+model_es = NGramModel(n)
 model_es.load_ngrams_freq(frequency_es_dict)
 
 # Get data
@@ -67,7 +70,8 @@ for word in words:
 acc = accuracy_score(t, y)
 print(acc)
 # 0.3306321355653757 # first try with unigrams and bigrams
-# 0.7512812260156966 # after fixing bug
+# 0.7512812260156966 # after fixing bug (string type vs. tuple type)
+# 0.7647990889059444 # using bigrams and trigrams
 
 # Fq score
 f1 = f1_score(t, y, average=None)
@@ -77,4 +81,4 @@ print(f1)
 conf_matrix = confusion_matrix(t, y)
 classes = ['ambiguous', 'fw', 'lang1', 'lang2', 'mixed', 'ne', 'other', 'unk']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot(values_format='d')
-plt.savefig("confusion_matrix_ngrams.png")
+plt.savefig('confusion_matrix_' + str(n) + '_grams.png')

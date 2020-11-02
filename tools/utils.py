@@ -2,14 +2,14 @@ import csv
 import emoji
 import string
 
-def write_dict(DICTIONARIES_PATH, frequency_dict, lang, probability_dict=None):
-	frequency_dict_csv = csv.writer(open(DICTIONARIES_PATH+'frequency_dict_' + lang + '.csv', 'w',encoding='UTF-16'))
+def write_dict(DICTIONARIES_PATH, frequency_dict, freq_dict_filename, probability_dict=None, probability_dict_filename=''):
+	frequency_dict_csv = csv.writer(open(DICTIONARIES_PATH + freq_dict_filename + '.csv', 'w', encoding='UTF-16'))
 	frequency_dict_csv.writerow(['word', 'frequency'])
 	for key, val in frequency_dict.items():
 		frequency_dict_csv.writerow([key, val])
 
 	if probability_dict is not None:
-		probability_dict_csv = csv.writer(open(DICTIONARIES_PATH +'probability_dict_' + lang + '.csv', 'w',encoding='UTF-16'))
+		probability_dict_csv = csv.writer(open(DICTIONARIES_PATH + probability_dict_filename + '.csv', 'w', encoding='UTF-16'))
 		probability_dict_csv.writerow(['word', 'probability'])
 		for key, val in probability_dict.items():
 			probability_dict_csv.writerow([key, val])

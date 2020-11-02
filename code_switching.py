@@ -1,10 +1,9 @@
 import pandas as pd
-import os
+import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
 
 DICTIONARIES_PATH = "./dictionaries/word-level/"
 
@@ -15,7 +14,7 @@ probability_en_dict = probability_en_df.set_index('word')['probability'].to_dict
 probability_es_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_es.csv', encoding='utf-16')
 probability_es_dict = probability_es_df.set_index('word')['probability'].to_dict()
 
-probability_other_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_other.csv', encoding='utf-16')
+probability_other_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_other.csv', encoding='utf-8')
 probability_other_dict = probability_other_df.set_index('word')['probability'].to_dict()
 
 # Get data
@@ -88,6 +87,7 @@ print(acc)
 # 0.7643007491479774 # after fixing bug
 # 0.7658330075309709 # after implementing tokenizer
 # 0.6598583845731594 # after using "other" dictionary
+# 0.7861899928201828 # after better tokenization
 
 # Fq score
 f1 = f1_score(t, y, average=None)

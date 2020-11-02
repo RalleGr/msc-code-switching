@@ -60,15 +60,15 @@ def merge(dict1, dict2):
 # Dictionaries for English
 frequency_dict_en, other_dict_en = get_frequency_dict('en')
 probability_dict_en = get_probability_dict(frequency_dict_en)
-write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_dict_en, 'en', probability_dict_en)
+write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_dict_en, 'frequency_dict_en', probability_dict_en, 'probability_dict_en')
 
 # Dictionaries for Spanish
 frequency_dict_es, other_dict_es = get_frequency_dict('es')
 probability_dict_es = get_probability_dict(frequency_dict_es)
-write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_dict_es, 'es', probability_dict_es)
+write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_dict_es, 'frequency_dict_es', probability_dict_es, 'probability_dict_es')
 
 # Dictionaries for other class
 other_dict = merge(other_dict_en, other_dict_es)
 probability_dict_other = get_probability_dict(other_dict)
-write_dict(WORD_LEVEL_DICTIONARIES_PATH, other_dict, 'other')
+write_dict(WORD_LEVEL_DICTIONARIES_PATH, other_dict, 'frequency_dict_other')
 
