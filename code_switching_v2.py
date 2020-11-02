@@ -1,22 +1,21 @@
 import pandas as pd
-import os
+import matplotlib.pyplot as plt
+import ast
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
-import matplotlib.pyplot as plt
 from ngrams.ngrams import NGramModel
-from tools.utils import write_dict
 from tools.utils import is_other
 
 CHAR_LEVEL_DICTIONARIES_PATH = "./dictionaries/character-level/"
 
 # Get dictionaries
 print("Getting dictionaries...")
-frequency_en_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH+'frequency_dict_en.csv',encoding='utf-16')
+frequency_en_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH+'frequency_dict_en.csv',encoding='utf-16', converters={"word": ast.literal_eval})
 frequency_en_dict = frequency_en_df.set_index('word')['frequency'].to_dict()
 
-frequency_es_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH+'frequency_dict_es.csv',encoding='utf-16')
+frequency_es_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH+'frequency_dict_es.csv',encoding='utf-16', converters={"word": ast.literal_eval})
 frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
 
 # Apply ngram model to en, es and other

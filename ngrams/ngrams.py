@@ -45,6 +45,7 @@ class NGramModel:
 	def get_word_log_prob(self, word):
 		word_log_prob = 0
 		for i in range(len(word)):
+			prob = 0
 			if (i == 0):
 				bigram = ('<s>', word[i])
 				prob = self.get_freq(bigram) / self.get_freq(('<s>',))
@@ -56,6 +57,5 @@ class NGramModel:
 				bigram = (word[i], word[i + 1])
 				c = word[i]
 				prob = self.get_freq(bigram) / self.get_freq((c,))
-			# print(prob)
 			word_log_prob += np.log(prob)
 		return word_log_prob
