@@ -51,38 +51,38 @@ class NGramModel:
 
 	def get_word_log_prob(self, word):
 		word_log_prob = 0
-		for i in range(len(word)):
-			prob = 0
-			if (self.n == 2):
+		if (self.n == 2):
+			for i in range(len(word) + 1):
 				if (i == 0):
 					bigram = ('<w>', word[i])
 					unigram = ('<w>',)
-				elif (i == len(word) - 1):
-					bigram = (word[i], ('</w>',))
-					unigram = (word[i],)
+				elif (i == len(word)):
+					bigram = (word[i-1], ('</w>',))
+					unigram = (word[i-1],)
 				else:
-					bigram = (word[i], word[i+1])
-					unigram = (word[i],)
+					bigram = (word[i-1], word[i])
+					unigram = (word[i-1],)
 				prob = self.get_freq(bigram) / self.get_freq(unigram)
+				word_log_prob += np.log(prob)
 			
-			elif (self.n == 3):
+		elif (self.n == 3):
+			for i in range(len(word) + 2):
 				if (i == 0):
 					trigram = ('<w>', '<w>', word[i])
 					bigram = ('<w>', '<w>')
 				elif (i == 1):
-					trigram = ('<w>', word[i], word[i+1]) if len(word) > 2 else ('<w>', word[i], '</w>')
-					bigram = ('<w>', word[i])
-				elif (i == len(word) - 2):
-					trigram = (word[i], word[i+1], '</w>')
-					bigram = (word[i], word[i+1])
-				elif (i == len(word) -1):
-					trigram = (word[i], '</w>', '</w>')
-					bigram = (word[i], '</w>')
+					trigram = ('<w>', word[i-1], word[i]) if len(word) >= 2 else ('<w>', word[i-1], '</w>')
+					bigram = ('<w>', word[i-1])
+				elif (i == len(word)):
+					trigram = (word[i-2], word[i-1], '</w>')
+					bigram = (word[i-2], word[i-1])
+				elif (i == len(word) + 1):
+					trigram = (word[i-2], '</w>', '</w>')
+					bigram = (word[i-2], '</w>')
 				else:
-					trigram = (word[i], word[i+1], word[i+2])
-					bigram = (word[i], word[i+1])
+					trigram = (word[i-2], word[i-1], word[i])
+					bigram = (word[i-2], word[i-1])
 				prob = self.get_freq(trigram) / self.get_freq(bigram)
-
-			word_log_prob += np.log(prob)
+				word_log_prob += np.log(prob)
 
 		return word_log_prob

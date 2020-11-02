@@ -72,6 +72,8 @@ print(acc)
 # 0.3306321355653757 # first try with unigrams and bigrams
 # 0.7512812260156966 # after fixing bug (string type vs. tuple type)
 # 0.7647990889059444 # using bigrams and trigrams
+# 0.7778960659552870 # using unigrams and bigrams, fixed bug when ngrams are skipped (explain on old code)
+# 0.8583347775494541 # using bigrams and trigrams on fixed code
 
 # Fq score
 f1 = f1_score(t, y, average=None)
