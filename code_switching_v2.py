@@ -43,10 +43,10 @@ for line in file:
 	if (line.strip() is not '' and '# sent_enum' not in line):
 		line = line.rstrip('\n')
 		splits = line.split("\t")
-		words.append(splits[0])
-		if (splits[1]=='ambiguous' or splits[1]=='fw' or splits[1]=='mixed' or splits[1]=='ne'):
-			t.append('unk')
+		if (splits[1]=='ambiguous' or splits[1]=='fw' or splits[1]=='mixed' or splits[1]=='ne' or splits[1]=='unk'):
+			continue
 		else:
+			words.append(splits[0])
 			t.append(splits[1])
 file.close()
 
@@ -63,9 +63,7 @@ for word in words:
 		prob_es = model_es.get_word_log_prob(word)
 		# print(f"EN: {word} : {prob_en}")
 		# print(f"ES: {word} : {prob_es}")
-		if(prob_en < -30 and prob_es < -30):
-			lang = 'unk'
-		elif (prob_en >= prob_es):
+		if (prob_en >= prob_es):
 			lang = 'lang1'
 		else:
 			lang = 'lang2'
@@ -86,6 +84,8 @@ print(acc)
 # 0.8583347775494541 # using bigrams and trigrams on fixed code
 # 0.8786610878661087 # using trigrams and 4 grams
 # 0.8901983115050383 # using 4 grams and 5 grams
+# 0.8892079918793790 # using 5 grams and 6 grams
+# 0.9113856748613819 # completely ignoring ne, unk, ambiguous, mixed, etc.
 
 # Fq score
 f1 = f1_score(t, y, average=None)
@@ -93,6 +93,6 @@ print(f1)
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)
-classes = ['lang1', 'lang2', 'other', 'unk']
+classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot(values_format='d')
 plt.savefig('confusion_matrix_' + str(n) + '_grams.svg',format='svg')
