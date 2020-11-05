@@ -11,10 +11,9 @@ import sys
 
 CHAR_LEVEL_DICTIONARIES_PATH = "./dictionaries/character-level/"
 
-# n = 2
 n = int(sys.argv[1])
-if n!=2 and n!=3 and n!=4:
-	print("n should be 2 or 3 or 4")
+if n!=2 and n!=3 and n!=4 and n!=5:
+	print("n should be 2, 3, 4 or 5")
 	exit(1)
 
 # Get dictionaries
