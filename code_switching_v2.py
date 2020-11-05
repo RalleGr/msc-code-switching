@@ -94,4 +94,4 @@ print(f1)
 conf_matrix = confusion_matrix(t, y)
 classes = ['lang1', 'lang2', 'other', 'unk']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot(values_format='d')
-plt.savefig('confusion_matrix_' + str(n) + '_grams.png')
+plt.savefig('confusion_matrix_' + str(n) + '_grams.svg',format='svg')
