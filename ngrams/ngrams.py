@@ -166,6 +166,9 @@ class NGramModel:
 				elif (i == len(word) + 2):
 					fivegram = (word[i-4], word[i-3], '</w>', '</w>', '</w>')
 					fourgram = (word[i-4], word[i-3], '</w>', '</w>')
+				elif (i == len(word) + 3):
+					fivegram = (word[i-4], '</w>', '</w>', '</w>', '</w>')
+					fourgram = (word[i-4], '</w>', '</w>', '</w>')
 				else:
 					fivegram = (word[i-4], word[i-3], word[i-2], word[i-1], word[i])
 					fourgram = (word[i-4], word[i-3], word[i-2], word[i-1])
