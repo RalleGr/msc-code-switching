@@ -85,6 +85,7 @@ print(acc)
 # 0.7778960659552870 # using unigrams and bigrams, fixed bug when ngrams are skipped (explain on old code)
 # 0.8583347775494541 # using bigrams and trigrams on fixed code
 # 0.8786610878661087 # using trigrams and 4 grams
+# 0.8901983115050383 # using 4 grams and 5 grams
 
 # Fq score
 f1 = f1_score(t, y, average=None)
