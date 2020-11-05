@@ -7,11 +7,15 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from ngrams.ngrams import NGramModel
 from tools.utils import is_other
+import sys
 
 CHAR_LEVEL_DICTIONARIES_PATH = "./dictionaries/character-level/"
 
 # n = 2
-n = 3
+n = int(sys.argv[1])
+if n!=2 and n!=3 and n!=4:
+	print("n should be 2 or 3 or 4")
+	exit(1)
 
 # Get dictionaries
 print("Getting dictionaries...")
@@ -41,7 +45,10 @@ for line in file:
 		line = line.rstrip('\n')
 		splits = line.split("\t")
 		words.append(splits[0])
-		t.append(splits[1])
+		if (splits[1]=='ambiguous' or splits[1]=='fw' or splits[1]=='mixed' or splits[1]=='ne'):
+			t.append('unk')
+		else:
+			t.append(splits[1])
 file.close()
 
 # Choose language with highest probability for each word based on ngrams
@@ -55,7 +62,11 @@ for word in words:
 	else:
 		prob_en = model_en.get_word_log_prob(word)
 		prob_es = model_es.get_word_log_prob(word)
-		if (prob_en >= prob_es):
+		# print(f"EN: {word} : {prob_en}")
+		# print(f"ES: {word} : {prob_es}")
+		if(prob_en < -30 and prob_es < -30):
+			lang = 'unk'
+		elif (prob_en >= prob_es):
 			lang = 'lang1'
 		else:
 			lang = 'lang2'
@@ -74,6 +85,7 @@ print(acc)
 # 0.7647990889059444 # using bigrams and trigrams
 # 0.7778960659552870 # using unigrams and bigrams, fixed bug when ngrams are skipped (explain on old code)
 # 0.8583347775494541 # using bigrams and trigrams on fixed code
+# 0.8786610878661087 # using trigrams and 4 grams
 
 # Fq score
 f1 = f1_score(t, y, average=None)
@@ -81,6 +93,6 @@ print(f1)
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)
-classes = ['ambiguous', 'fw', 'lang1', 'lang2', 'mixed', 'ne', 'other', 'unk']
+classes = ['lang1', 'lang2', 'other', 'unk']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot(values_format='d')
 plt.savefig('confusion_matrix_' + str(n) + '_grams.png')

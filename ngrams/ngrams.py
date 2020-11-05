@@ -24,6 +24,7 @@ class NGramModel:
 		unigrams = []
 		bigrams = []
 		trigrams = []
+		fourgrams = []
 		for token in self.tokens_dict.keys():
 			if type(token) is float:
 				print(f"ERROR : unknown token {token}")
@@ -41,10 +42,13 @@ class NGramModel:
 				if (len(ngram) == 2 and self.n <= 3):
 					for i in range(self.tokens_dict[token]):
 						bigrams.append(ngram)
-				if (len(ngram) == 3 and self.n <= 3):
+				if (len(ngram) == 3 and self.n <= 4):
 					for i in range(self.tokens_dict[token]):
 						trigrams.append(ngram)
-		return unigrams + bigrams + trigrams
+				if (len(ngram) == 4 and self.n <= 4):
+					for i in range(self.tokens_dict[token]):
+						fourgrams.append(ngram)
+		return unigrams + bigrams + trigrams + fourgrams
 	
 	def load_ngrams_freq(self, freq_dist):
 		self.freq_dist = freq_dist
@@ -83,6 +87,39 @@ class NGramModel:
 					trigram = (word[i-2], word[i-1], word[i])
 					bigram = (word[i-2], word[i-1])
 				prob = self.get_freq(trigram) / self.get_freq(bigram)
+				word_log_prob += np.log(prob)
+
+		elif (self.n == 4):
+			for i in range(len(word) + 3):
+				if (i == 0):
+					fourgram = ('<w>', '<w>', '<w>', word[i])
+					trigram = ('<w>', '<w>', '<w>')
+				elif (i == 1):
+					fourgram = ('<w>', '<w>', word[i-1], word[i]) if len(word) >= 2 else ('<w>', '<w>', word[i-1], '</w>')
+					trigram = ('<w>', '<w>', word[i-1])
+				elif (i == 2):
+					if len(word)==1:
+						fourgram = ('<w>', word[i-2], '</w>', '</w>')
+						trigram = ('<w>', word[i-2], '</w>')
+					elif len(word)==2:
+						fourgram = ('<w>', word[i-2], word[i-1], '</w>')
+						trigram = ('<w>', word[i-2], word[i-1])
+					else:
+						fourgram = ('<w>', word[i-2], word[i-1], word[i]) 
+						trigram = ('<w>', word[i-2], word[i-1]) 
+				elif (i == len(word)):
+					fourgram = (word[i-3], word[i-2], word[i-1], '</w>')
+					trigram = (word[i-3], word[i-2], word[i-1])
+				elif (i == len(word) + 1):
+					fourgram = (word[i-3], word[i-2], '</w>', '</w>')
+					trigram = (word[i-3], word[i-2], '</w>')
+				elif (i == len(word) + 2):
+					fourgram = (word[i-3], '</w>', '</w>', '</w>')
+					trigram = (word[i-3], '</w>', '</w>')
+				else:
+					fourgram = (word[i-3], word[i-2], word[i-1], word[i])
+					trigram = (word[i-3], word[i-2], word[i-1])
+				prob = self.get_freq(fourgram) / self.get_freq(trigram)
 				word_log_prob += np.log(prob)
 
 		return word_log_prob
