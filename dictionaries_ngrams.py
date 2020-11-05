@@ -18,8 +18,8 @@ frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
 
 # Create ngrams frequency dictionaries
 n = int(sys.argv[1])
-if n!=2 and n!=3 and n!=4 and n!=5:
-	print("n should be 2, 3, 4 or 5")
+if n!=2 and n!=3 and n!=4 and n!=5 and n!=6:
+	print("n should be 2, 3, 4, 5 or 6")
 	exit(1)
 
 model_en = NGramModel(n)

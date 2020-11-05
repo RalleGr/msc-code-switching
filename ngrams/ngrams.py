@@ -26,6 +26,7 @@ class NGramModel:
 		trigrams = []
 		fourgrams = []
 		fivegrams = []
+		sixgrams = []
 		for token in self.tokens_dict.keys():
 			if type(token) is float:
 				print(f"ERROR : unknown token {token}")
@@ -49,10 +50,13 @@ class NGramModel:
 				if (len(ngram) == 4 and self.n <= 5):
 					for i in range(self.tokens_dict[token]):
 						fourgrams.append(ngram)
-				if (len(ngram) == 5 and self.n <= 5):
+				if (len(ngram) == 5 and self.n <= 6):
 					for i in range(self.tokens_dict[token]):
 						fivegrams.append(ngram)
-		return unigrams + bigrams + trigrams + fourgrams + fivegrams
+				if (len(ngram) == 6 and self.n <= 6):
+					for i in range(self.tokens_dict[token]):
+						sixgrams.append(ngram)
+		return unigrams + bigrams + trigrams + fourgrams + fivegrams + sixgrams
 	
 	def load_ngrams_freq(self, freq_dist):
 		self.freq_dist = freq_dist
@@ -173,6 +177,74 @@ class NGramModel:
 					fivegram = (word[i-4], word[i-3], word[i-2], word[i-1], word[i])
 					fourgram = (word[i-4], word[i-3], word[i-2], word[i-1])
 				prob = self.get_freq(fivegram) / self.get_freq(fourgram)
+				word_log_prob += np.log(prob)
+
+		elif (self.n == 6):
+			for i in range(len(word) + 5):
+				if (i == 0):
+					sixgram = ('<w>', '<w>', '<w>', '<w>', '<w>', word[i])
+					fivegram = ('<w>', '<w>', '<w>', '<w>', '<w>')
+				elif (i == 1):
+					sixgram = ('<w>', '<w>', '<w>', '<w>', word[i-1], word[i]) if len(word) >= 2 else ('<w>', '<w>', '<w>', '<w>', word[i-1], '</w>')
+					fivegram = ('<w>', '<w>', '<w>', '<w>', word[i-1])
+				elif (i == 2):
+					if len(word)==1:
+						sixgram = ('<w>', '<w>', '<w>', word[i-2], '</w>', '</w>')
+						fivegram = ('<w>', '<w>', '<w>', word[i-2], '</w>')
+					elif len(word)==2:
+						sixgram = ('<w>', '<w>', '<w>', word[i-2], word[i-1], '</w>')
+						fivegram = ('<w>', '<w>', '<w>', word[i-2], word[i-1])
+					else:
+						sixgram = ('<w>', '<w>', '<w>', word[i-2], word[i-1], word[i]) 
+						fivegram = ('<w>', '<w>', '<w>', word[i-2], word[i-1]) 
+				elif (i == 3):
+					if len(word)==1:
+						sixgram = ('<w>', '<w>', word[i-3], '</w>', '</w>', '</w>')
+						fivegram = ('<w>', '<w>', word[i-3], '</w>', '</w>')
+					elif len(word)==2:
+						sixgram = ('<w>', '<w>', word[i-3], word[i-2], '</w>', '</w>')
+						fivegram = ('<w>', '<w>', word[i-3], word[i-2], '</w>')
+					elif len(word)==3:
+						sixgram = ('<w>', '<w>', word[i-3], word[i-2], word[i-1], '</w>')
+						fivegram = ('<w>', '<w>', word[i-3], word[i-2], word[i-1])
+					else:
+						sixgram = ('<w>', '<w>', word[i-3], word[i-2], word[i-1], word[i]) 
+						fivegram = ('<w>', '<w>', word[i-3], word[i-2], word[i-1])
+				elif (i == 4):
+					if len(word)==1:
+						sixgram = ('<w>', word[i-4], '</w>', '</w>', '</w>', '</w>')
+						fivegram = ('<w>', word[i-4], '</w>', '</w>', '</w>')
+					elif len(word)==2:
+						sixgram = ('<w>', word[i-4], word[i-3], '</w>', '</w>', '</w>')
+						fivegram = ('<w>', word[i-4], word[i-3], '</w>', '</w>')
+					elif len(word)==3:
+						sixgram = ('<w>', word[i-4], word[i-3], word[i-2], '</w>', '</w>')
+						fivegram = ('<w>',word[i-4], word[i-3], word[i-2], '</w>')
+					elif len(word)==4:
+						sixgram = ('<w>', word[i-4], word[i-3], word[i-2], word[i-1], '</w>')
+						fivegram = ('<w>',word[i-4], word[i-3], word[i-2], word[i-1])
+					else:
+						sixgram = ('<w>', word[i-4], word[i-3], word[i-2], word[i-1], word[i])
+						fivegram = ('<w>', word[i-4], word[i-3], word[i-2], word[i-1])
+				elif (i == len(word)):
+					sixgram = (word[i-5], word[i-4], word[i-3], word[i-2], word[i-1], '</w>')
+					fivegram = (word[i-5], word[i-4], word[i-3], word[i-2], word[i-1])
+				elif (i == len(word) + 1):
+					sixgram = (word[i-5], word[i-4], word[i-3], word[i-2], '</w>', '</w>')
+					fivegram = (word[i-5], word[i-4], word[i-3], word[i-2], '</w>')
+				elif (i == len(word) + 2):
+					sixgram = (word[i-5], word[i-4], word[i-3], '</w>', '</w>', '</w>')
+					fivegram = (word[i-5], word[i-4], word[i-3], '</w>', '</w>')
+				elif (i == len(word) + 3):
+					sixgram = (word[i-5], word[i-4], '</w>', '</w>', '</w>', '</w>')
+					fivegram = (word[i-5], word[i-4], '</w>', '</w>', '</w>')
+				elif (i == len(word) + 4):
+					sixgram = (word[i-5], '</w>', '</w>', '</w>', '</w>', '</w>')
+					fivegram = (word[i-5], '</w>', '</w>', '</w>', '</w>')
+				else:
+					sixgram = (word[i-5], word[i-4], word[i-3], word[i-2], word[i-1], word[i])
+					fivegram = (word[i-5], word[i-4], word[i-3], word[i-2], word[i-1])
+				prob = self.get_freq(sixgram) / self.get_freq(fivegram)
 				word_log_prob += np.log(prob)
 
 		return word_log_prob
