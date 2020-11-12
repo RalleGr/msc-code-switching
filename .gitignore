@@ -1,3 +1,5 @@
 .vscode
 **/__pycache__
 /**/__pycache__
+tokenized_sentences_en.p
+tokenized_sentences_es.p
