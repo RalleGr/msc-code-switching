@@ -1,6 +1,7 @@
 import pandas as pd
 from ngrams.ngrams import NGramModel
 from tools.utils import write_dict
+from tools.utils import is_other
 import sys
 import os
 from bs4 import BeautifulSoup
@@ -68,9 +69,15 @@ def get_tokenized_sentences(lang):
 			sentences = re.split(r"(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s", cleantext)
 			
 			# Split in tokens
-			tokens = [tokenizer(s) for s in sentences]
+			for s in sentences:
+				word_tokens = []
+				tokens = list(tokenizer(s))
+				for t in tokens:
+					t = t.text.lower()
+					if (not is_other(t)):
+						word_tokens.append(t)
 
-			tokenizedFile.append(tokens)
+				tokenizedFile.append(word_tokens)
 
 	return tokenizedFile
 
