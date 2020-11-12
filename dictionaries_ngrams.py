@@ -81,6 +81,10 @@ def get_tokenized_sentences(lang):
 
 	return tokenizedFile
 
-tokenized_sentences_en = get_tokenized_sentences('en')
-with open('tokenized_sentences_en.p', 'wb') as fp:
-	pickle.dump(tokenized_sentences_en, fp)
+# tokenized_sentences_en = get_tokenized_sentences('en')
+# with open('tokenized_sentences_en.p', 'wb') as fp:
+# 	pickle.dump(tokenized_sentences_en, fp)
+
+tokenized_sentences_es = get_tokenized_sentences('es')
+with open('tokenized_sentences_es.p', 'wb') as fp:
+	pickle.dump(tokenized_sentences_es, fp)
