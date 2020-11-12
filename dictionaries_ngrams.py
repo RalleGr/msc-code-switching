@@ -1,5 +1,5 @@
 import pandas as pd
-from ngrams.ngrams import NGramModel
+from ngrams.word_ngrams import NGramModel
 from tools.utils import write_dict
 from tools.utils import is_other
 import sys
@@ -85,6 +85,17 @@ def get_tokenized_sentences(lang):
 # with open('tokenized_sentences_en.p', 'wb') as fp:
 # 	pickle.dump(tokenized_sentences_en, fp)
 
-tokenized_sentences_es = get_tokenized_sentences('es')
-with open('tokenized_sentences_es.p', 'wb') as fp:
-	pickle.dump(tokenized_sentences_es, fp)
+# tokenized_sentences_es = get_tokenized_sentences('es')
+# with open('tokenized_sentences_es.p', 'wb') as fp:
+# 	pickle.dump(tokenized_sentences_es, fp)
+
+tokenized_sentences_en = pd.read_pickle(r'tokenized_sentences_en.p')
+tokenized_sentences_es = pd.read_pickle(r'tokenized_sentences_es.p')
+
+model_en = NGramModel(n)
+model_en.train(tokenized_sentences_en)
+write_dict(WORD_LEVEL_DICTIONARIES_PATH, model_en.freq_dist, str(n) + '_grams_word_dict_en')
+
+model_es = NGramModel(n)
+model_es.train(tokenized_sentences_es)
+write_dict(WORD_LEVEL_DICTIONARIES_PATH, model_es.freq_dist, str(n) + '_grams_word_dict_es')

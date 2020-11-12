@@ -97,5 +97,5 @@ print(f1)
 conf_matrix = confusion_matrix(t, y)
 classes = ['ambiguous', 'fw', 'lang1', 'lang2', 'mixed', 'ne', 'other', 'unk']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot(values_format='d')
-plt.savefig("confusion_matrix.svg",format='svg')
+plt.savefig("/results/confusion_matrix.svg",format='svg')
 
