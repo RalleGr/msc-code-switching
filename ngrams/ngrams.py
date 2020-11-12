@@ -2,6 +2,8 @@ from nltk.lm.preprocessing import pad_sequence
 from nltk.util import everygrams
 from nltk import FreqDist
 import numpy as np
+from numpy.lib import utils
+from tools.utils import printStatus
 
 class NGramModel:
 	def __init__(self, n):
@@ -27,6 +29,8 @@ class NGramModel:
 		fourgrams = []
 		fivegrams = []
 		sixgrams = []
+		printStatus("Creating n-grams...")
+		j = 0
 		for token in self.tokens_dict.keys():
 			if type(token) is float:
 				print(f"ERROR : unknown token {token}")
@@ -56,6 +60,9 @@ class NGramModel:
 				if (len(ngram) == 6 and self.n <= 6):
 					for i in range(self.tokens_dict[token]):
 						sixgrams.append(ngram)
+			if j % (len(self.tokens_dict)/10) == 0:
+				print(f"token {j} of {len(self.tokens_dict)}")
+			j+=1
 		return unigrams + bigrams + trigrams + fourgrams + fivegrams + sixgrams
 	
 	def load_ngrams_freq(self, freq_dist):
@@ -63,6 +70,7 @@ class NGramModel:
 
 	def get_word_log_prob(self, word):
 		word_log_prob = 0
+		printStatus("Calculating word log probability...")
 		if (self.n == 2):
 			for i in range(len(word) + 1):
 				if (i == 0):

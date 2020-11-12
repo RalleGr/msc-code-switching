@@ -1,6 +1,7 @@
 import csv
 import emoji
 import string
+from datetime import datetime
 
 def write_dict(DICTIONARIES_PATH, frequency_dict, freq_dict_filename, probability_dict=None, probability_dict_filename=''):
 	frequency_dict_csv = csv.writer(open(DICTIONARIES_PATH + freq_dict_filename + '.csv', 'w', encoding='UTF-16'))
@@ -33,3 +34,8 @@ def is_other(word):
 		if c in string.punctuation and c is not "\'":
 			return True
 	return False
+
+def printStatus(status):
+	now = datetime.now()
+	current_time = now.strftime("%H:%M:%S")
+	print(f"[{current_time}] {status}")

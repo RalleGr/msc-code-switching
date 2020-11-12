@@ -7,6 +7,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from ngrams.ngrams import NGramModel
 from tools.utils import is_other
+from tools.utils import printStatus
 import sys
 
 CHAR_LEVEL_DICTIONARIES_PATH = "./dictionaries/character-level/"
@@ -17,7 +18,7 @@ if n!=2 and n!=3 and n!=4 and n!=5 and n!=6:
 	exit(1)
 
 # Get dictionaries
-print("Getting dictionaries...")
+printStatus("Getting dictionaries...")
 frequency_en_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_dict_en.csv', encoding='utf-16', converters={"word": ast.literal_eval})
 frequency_en_dict = frequency_en_df.set_index('word')['frequency'].to_dict()
 
@@ -25,7 +26,7 @@ frequency_es_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_di
 frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
 
 # Apply ngram model to en, es and other
-print("Applying NGRAM model...")
+printStatus("Applying NGRAM model...")
 model_en = NGramModel(n)
 model_en.load_ngrams_freq(frequency_en_dict)
 
@@ -33,7 +34,7 @@ model_es = NGramModel(n)
 model_es.load_ngrams_freq(frequency_es_dict)
 
 # Get data
-print("Getting test data...")
+printStatus("Getting test data...")
 filepath = 'datasets/bilingual-annotated/dev.conll'
 file = open(filepath, 'rt', encoding='utf8')
 words = []
@@ -53,7 +54,7 @@ file.close()
 # Choose language with highest probability for each word based on ngrams
 y = []
 counter = 0
-print("Classifying...")
+printStatus("Classifying...")
 for word in words:
 	word = word.lower()
 	if is_other(word):
