@@ -1,5 +1,5 @@
 import pandas as pd
-from ngrams.word_ngrams import NGramModel
+from models.ngrams.word_ngrams import NGramModel
 from tools.utils import write_dict
 from tools.utils import is_other
 import sys
