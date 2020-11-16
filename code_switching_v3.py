@@ -5,7 +5,7 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
-from ngrams.word_ngrams import NGramModel
+from models.ngrams.word_ngrams import NGramModel
 from tools.utils import is_other
 from tools.utils import printStatus
 import sys
