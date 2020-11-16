@@ -83,7 +83,7 @@ for s in sentences:
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
-# 0.617363344051447 # with unigrams and bigrams
+# 0.4984176013368104 # with unigrams and bigrams
 
 # Fq score
 f1 = f1_score(t, y, average=None)
