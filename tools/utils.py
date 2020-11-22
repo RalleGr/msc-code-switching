@@ -35,6 +35,11 @@ def is_other(word):
 			return True
 	return False
 
+# Python code to merge dict using update() method
+def merge_dictionaries(dict1, dict2):
+	dict2.update(dict1)
+	return dict2
+
 def printStatus(status):
 	now = datetime.now()
 	current_time = now.strftime("%H:%M:%S")

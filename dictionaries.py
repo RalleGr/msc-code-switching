@@ -4,6 +4,7 @@ from spacy.lang.es import Spanish
 import os
 from tools.utils import write_dict
 from tools.utils import is_other
+from tools.utils import merge_dictionaries
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
@@ -52,11 +53,6 @@ def get_probability_dict(frequency_dict):
 		probability_dict[k] = v / nr_of_tokens
 	return probability_dict
 
-# Python code to merge dict using update() method
-def merge(dict1, dict2):
-	dict2.update(dict1)
-	return dict2
-
 # Dictionaries for English
 frequency_dict_en, other_dict_en = get_frequency_dict('en')
 probability_dict_en = get_probability_dict(frequency_dict_en)
@@ -68,7 +64,7 @@ probability_dict_es = get_probability_dict(frequency_dict_es)
 write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_dict_es, 'frequency_dict_es', probability_dict_es, 'probability_dict_es')
 
 # Dictionaries for other class
-other_dict = merge(other_dict_en, other_dict_es)
+other_dict = merge_dictionaries(other_dict_en, other_dict_es)
 probability_dict_other = get_probability_dict(other_dict)
 write_dict(WORD_LEVEL_DICTIONARIES_PATH, other_dict, 'frequency_dict_other')
 
