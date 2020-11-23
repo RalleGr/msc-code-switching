@@ -75,7 +75,7 @@ acc = accuracy_score(t, y)
 print(acc)
 # 0.9447299794921133 # with 2grams
 # 0.9437678811048941 # with 3grams
-# 0.9401220345849052 # with 4grams - did NOT try further with 5, 6, etc
+# 0.9401220345849052 # with 4grams - stop here
 
 # Fq score
 f1 = f1_score(t, y, average=None)
