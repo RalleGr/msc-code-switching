@@ -6,44 +6,34 @@ from sklearn.metrics import confusion_matrix
 from tools.utils import is_other
 from tools.utils import printStatus
 from sklearn.feature_extraction.text import CountVectorizer
-from sklearn.decomposition import LatentDirichletAllocation as LDA
-from tools.utils import merge_dictionaries
+from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 import pandas as pd
-WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
-# sources: https://towardsdatascience.com/end-to-end-topic-modeling-in-python-latent-dirichlet-allocation-lda-35ce4ed6b3e0
-# https://github.com/kapadias/mediumposts/blob/master/nlp/published_notebooks/Introduction%20to%20Topic%20Modeling.ipynb
-
-# Get train dictionaries
+# Get training dictionaries
 printStatus("Getting tokenized sentences...")
 tokenized_sentences_en = pd.read_pickle(r'tokenized_sentences_en.p')
 tokenized_sentences_es = pd.read_pickle(r'tokenized_sentences_es.p')
 
-data = tokenized_sentences_en + tokenized_sentences_es
-data = [" ".join(l) for l in data]
-print(data[:3])
+# Flatten lists, so we have a long array of strings (words)
+tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:100000]
+tokenized_sentences_es = [item for sent in tokenized_sentences_es for item in sent][:100000]
+X_train = tokenized_sentences_en + tokenized_sentences_es
+
+t_train_en = ['lang1' for token in tokenized_sentences_en]
+t_train_es = ['lang2' for token in tokenized_sentences_es]
+t_train = t_train_en + t_train_es
 
 # Convert a collection of text documents to a matrix of token counts
-printStatus("Counting words...")
-count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(2, 2))
-count_data = count_vectorizer.fit_transform(data)
+printStatus("Counting ngrams...")
+count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5))
+count_data = count_vectorizer.fit_transform(X_train)
 
-
-number_topics = 2
-number_words = 1000 # not sure what this is 
-
-# Create and fit the LDA model - where the magic happens :)
-printStatus("Training LDA...")
-lda = LDA(n_components=number_topics)
-lda.fit(count_data)
-
-# Create a dictionary (word:topic_idx), where topic_idx can be 0 and 1 
-# representing two different language clusters
-words1 = count_vectorizer.get_feature_names()
-words_dict = dict()
-for topic_idx, topic in enumerate(lda.components_):
-	for i in topic.argsort()[:-number_words - 1:-1]:
-		words_dict[words1[i]] = topic_idx
+# Create and fit the SVM model
+printStatus("Training SVM...")
+# svm = LinearSVC()
+svm = SVC()
+svm.fit(count_data, t_train)
 
 # Get test data
 printStatus("Getting test data...")
@@ -69,17 +59,16 @@ predicted = []
 for word in words:
 	if(is_other(word)):
 		predicted.append('other')
-	elif (word not in words_dict.keys()): # again not sure how to handle this -_-
-		predicted.append('lang1')
-	elif (words_dict[word] == 0):
-		predicted.append('lang1')
 	else:
-		predicted.append('lang2')
+		word_vect = count_vectorizer.transform([word])
+		y = svm.predict(word_vect)[0]
+		predicted.append(y)
 
 # Get accuracy
 acc = accuracy_score(t, predicted)
 print(acc)
-# 0.7643618502671089
+# 0.8240580297237765 # at 1,000 words per lang
+# 0.8883965870825632 # at 100,000 words per lang - stop here (55 min in total)
 
 # Fq score
 f1 = f1_score(t, predicted, average=None)
@@ -90,4 +79,4 @@ conf_matrix = confusion_matrix(t, predicted)
 classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 					   display_labels=classes).plot(values_format='d')
-plt.savefig('./results/confusion_matrix_LDA.svg', format='svg')
+plt.savefig('./results/confusion_matrix_SVM.svg', format='svg')
