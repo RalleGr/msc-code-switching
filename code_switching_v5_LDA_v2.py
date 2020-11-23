@@ -14,42 +14,21 @@ WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 # sources: https://towardsdatascience.com/end-to-end-topic-modeling-in-python-latent-dirichlet-allocation-lda-35ce4ed6b3e0
 # https://github.com/kapadias/mediumposts/blob/master/nlp/published_notebooks/Introduction%20to%20Topic%20Modeling.ipynb
 
-# Get train dictionaries
+# Get training dictionaries
 printStatus("Getting tokenized sentences...")
 tokenized_sentences_en = pd.read_pickle(r'tokenized_sentences_en.p')
 tokenized_sentences_es = pd.read_pickle(r'tokenized_sentences_es.p')
 
-data = tokenized_sentences_en + tokenized_sentences_es
-data = [" ".join(l) for l in data]
-print(data[:3])
+# Flatten lists, so we have a long array of strings (words)
+tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:100000]
+tokenized_sentences_es = [item for sent in tokenized_sentences_es for item in sent][:100000]
+X_train = tokenized_sentences_en + tokenized_sentences_es
 
-# Convert a collection of text documents to a matrix of token counts
-printStatus("Counting words...")
-count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(2, 2))
-count_data = count_vectorizer.fit_transform(data)
-
-
-number_topics = 2
-number_words = 1000 # not sure what this is 
-
-# Create and fit the LDA model - where the magic happens :)
-printStatus("Training LDA...")
-lda = LDA(n_components=number_topics)
-lda.fit(count_data)
-
-# Create a dictionary (word:topic_idx), where topic_idx can be 0 and 1 
-# representing two different language clusters
-words1 = count_vectorizer.get_feature_names()
-words_dict = dict()
-for topic_idx, topic in enumerate(lda.components_):
-	for i in topic.argsort()[:-number_words - 1:-1]:
-		words_dict[words1[i]] = topic_idx
-
-# Get test data
-printStatus("Getting test data...")
+# Get 'dev' data
+printStatus("Getting dev data...")
 filepath = 'datasets/bilingual-annotated/dev.conll'
 file = open(filepath, 'rt', encoding='utf8')
-words = []
+dev_words = []
 t = []
 for line in file:
 	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
@@ -59,22 +38,49 @@ for line in file:
 		if (splits[1] == 'ambiguous' or splits[1] == 'fw' or splits[1] == 'mixed' or splits[1] == 'ne' or splits[1] == 'unk'):
 			continue
 		else:
-			words.append(splits[0].lower())
+			dev_words.append(splits[0].lower())
 			t.append(splits[1])
 file.close()
 
-# Create the array of predicted classes
+
+# Remove 'other' words
+printStatus("Removing 'other' data...")
+dev_words_not_other = []
+for word in dev_words:
+	if(not is_other(word)):
+		dev_words_not_other.append(word)
+
+
+# Convert a collection of words to a matrix of token counts
+printStatus("Counting ngrams...")
+count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5))
+count_train_data = count_vectorizer.fit_transform(X_train)
+count_dev_data = count_vectorizer.transform(dev_words_not_other)
+
+
+# Create and fit the LDA model - where the magic happens :)
+printStatus("Training LDA...")
+number_topics = 2
+lda_model = LDA(n_components=number_topics)
+lda_model.fit(count_train_data)
+lda = lda_model.transform(count_dev_data)
+
+# Predict
 printStatus("Predicting...")
+words_dict = dict()
+for i in range(len(dev_words_not_other)):
+	if(lda[i][0] > lda[i][1]):
+		topic = 'lang1'
+	else: 
+		topic = 'lang2'
+	words_dict[dev_words_not_other[i]] = topic
+
 predicted = []
-for word in words:
+for word in dev_words:
 	if(is_other(word)):
 		predicted.append('other')
-	elif (word not in words_dict.keys()): # again not sure how to handle this -_-
-		predicted.append('lang1')
-	elif (words_dict[word] == 0):
-		predicted.append('lang1')
 	else:
-		predicted.append('lang2')
+		predicted.append(words_dict[word])
 
 # Get accuracy
 acc = accuracy_score(t, predicted)
@@ -90,4 +96,14 @@ conf_matrix = confusion_matrix(t, predicted)
 classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 					   display_labels=classes).plot(values_format='d')
-plt.savefig('./results/confusion_matrix_LDA.svg', format='svg')
+plt.savefig('./results/confusion_matrix_LDA_v2.svg', format='svg')
+
+# Range 3-3
+# 0.5841962680709928
+# [0.43054036 0.54981203 0.93879938]
+# Range 1-4
+# 0.6342253842063954
+# [0.5790509  0.54110603 0.93879938]
+# Range 1-5
+# 0.6334911512266754
+# [0.57470909 0.54400767 0.93879938]
