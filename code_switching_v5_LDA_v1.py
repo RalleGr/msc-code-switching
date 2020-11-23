@@ -38,51 +38,37 @@ for word in words:
 		words_not_other.append(word)
 
 
-# Create an array with two items (equivalent to two 'documents')
-training_data = [" ".join(words_not_other[0:int(len(words_not_other)/2)]),
-				 " ".join(words_not_other[int(len(words_not_other)/2):])]
+# Convert a collection of words to a matrix of token counts
+printStatus("Counting ngrams...")
+count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(3, 3))
+count_data = count_vectorizer.fit_transform(words_not_other)
 
-
-
-# Convert a collection of text documents to a matrix of token counts
-printStatus("Counting words...")
-count_vectorizer = CountVectorizer()
-count_data = count_vectorizer.fit_transform(training_data)
-
-
-number_topics = 2
-number_words = 1000 # not sure what this is 
 
 # Create and fit the LDA model - where the magic happens :)
 printStatus("Training LDA...")
-lda = LDA(n_components=number_topics)
-lda.fit(count_data)
+number_topics = 2
+lda_model = LDA(n_components=number_topics)
+lda = lda_model.fit_transform(count_data)
 
-# Create a dictionary (word:topic_idx), where topic_idx can be 0 and 1 
-# representing two different language clusters
-words1 = count_vectorizer.get_feature_names()
-words_dict = dict()
-for topic_idx, topic in enumerate(lda.components_):
-	for i in topic.argsort()[:-number_words - 1:-1]:
-		words_dict[words1[i]] = topic_idx
-
-# Create the array of predicted classes
 printStatus("Predicting...")
+words_dict = dict()
+for i in range(len(words_not_other)):
+	if(lda[i][0] > lda[i][1]):
+		topic = 'lang1'
+	else: 
+		topic = 'lang2'
+	words_dict[words_not_other[i]] = topic
+
 predicted = []
 for word in words:
 	if(is_other(word)):
 		predicted.append('other')
-	elif (word not in words_dict.keys()): # again not sure how to handle this -_-
-		predicted.append('lang1')
-	elif (words_dict[word] == 0):
-		predicted.append('lang1')
 	else:
-		predicted.append('lang2')
+		predicted.append(words_dict[word])
 
 # Get accuracy
 acc = accuracy_score(t, predicted)
 print(acc)
-# 0.7643618502671089
 
 # Fq score
 f1 = f1_score(t, predicted, average=None)
@@ -94,3 +80,43 @@ classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 					   display_labels=classes).plot(values_format='d')
 plt.savefig('./results/confusion_matrix_LDA.svg', format='svg')
+
+# Using 'dev' dataset
+# Range 3-7 
+# 0.5972605514342861
+# [0.45288732 0.5623536  0.93879938]
+# Range 1-3 
+# 0.5677899587310429
+# [0.54245257 0.39536386 0.93879938]
+# Range 2-6 
+# 0.5775628528749019
+# [0.47643586 0.50289912 0.93879938]
+# Range 2-2 
+# 0.544648960680558
+# [0.43280361 0.46450636 0.93879938]
+# Range 3-3 
+# 0.604678836367319
+# [0.4516628  0.57757414 0.93879938]
+# Range 2-3 
+# 0.5697394738840925
+# [0.47148706 0.48893527 0.93879938]
+# Range 2-4 
+# 0.5823986631896093
+# [0.50342057 0.48884548 0.93879938]
+# Range 4-4 
+# 0.5630047851735575
+# [0.33100593 0.56122973 0.93879938]
+# Range 5-5
+# 0.537888953591412
+# [0.20413001 0.56551062 0.93879938]
+# Range 1-4
+# 0.5659670354710484
+# [0.50336957 0.44520933 0.93879938]
+
+# Using 'train' dataset
+# Range 1-4
+# 0.57299634321272
+# [0.46323118 0.49383586 0.91109107]
+# Range 3-3
+# 0.6626421803341617
+# [0.47662609 0.66587381 0.91109107]
