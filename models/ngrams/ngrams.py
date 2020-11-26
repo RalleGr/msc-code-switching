@@ -70,7 +70,6 @@ class NGramModel:
 
 	def get_word_log_prob(self, word):
 		word_log_prob = 0
-		printStatus("Calculating word log probability...")
 		if (self.n == 2):
 			for i in range(len(word) + 1):
 				if (i == 0):

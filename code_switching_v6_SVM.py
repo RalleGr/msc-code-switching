@@ -4,6 +4,7 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from tools.utils import is_other
+from tools.utils import save_predictions
 from tools.utils import printStatus
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.svm import SVC
@@ -12,8 +13,8 @@ import pandas as pd
 
 # Get training dictionaries
 printStatus("Getting tokenized sentences...")
-tokenized_sentences_en = pd.read_pickle(r'tokenized_sentences_en.p')
-tokenized_sentences_es = pd.read_pickle(r'tokenized_sentences_es.p')
+tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_en.p')
+tokenized_sentences_es = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_es.p')
 
 # Flatten lists, so we have a long array of strings (words)
 tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:100000]
@@ -53,30 +54,35 @@ for line in file:
 			t.append(splits[1])
 file.close()
 
-# Create the array of predicted classes
+# Create the array of y classes
 printStatus("Predicting...")
-predicted = []
+y = []
+predictions_dict = dict()
 for word in words:
 	if(is_other(word)):
-		predicted.append('other')
+		lang = 'other'
 	else:
 		word_vect = count_vectorizer.transform([word])
-		y = svm.predict(word_vect)[0]
-		predicted.append(y)
+		lang = svm.predict(word_vect)[0]
+	y.append(lang)
+	predictions_dict[word] = lang
 
 # Get accuracy
-acc = accuracy_score(t, predicted)
+acc = accuracy_score(t, y)
 print(acc)
 # 0.8240580297237765 # at 1,000 words per lang
 # 0.8883965870825632 # at 100,000 words per lang - stop here (55 min in total)
 
 # Fq score
-f1 = f1_score(t, predicted, average=None)
+f1 = f1_score(t, y, average=None)
 print(f1)
 
 # Confusion matrix
-conf_matrix = confusion_matrix(t, predicted)
+conf_matrix = confusion_matrix(t, y)
 classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 					   display_labels=classes).plot(values_format='d')
-plt.savefig('./results/confusion_matrix_SVM.svg', format='svg')
+plt.savefig('./results/CM/confusion_matrix_SVM.svg', format='svg')
+
+# Save model output
+save_predictions(predictions_dict, './results/predictions/predictions_SVM.txt')

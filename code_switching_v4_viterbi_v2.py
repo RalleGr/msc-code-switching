@@ -7,10 +7,10 @@ from sklearn.metrics import confusion_matrix
 from tools.utils import is_other
 from tools.utils import printStatus
 from tools.utils import merge_dictionaries
+from tools.utils import save_predictions
 import math
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
-n = 2
 
 def max_argmax(iterable):
 	"""Returns the tuple (argmax, max) for a list
@@ -108,6 +108,7 @@ for line in file:
 file.close()
 
 y = []
+predictions_dict = dict()
 # For each sentence
 for tokens in sentences:
 	if(len(tokens) > 0):
@@ -128,6 +129,8 @@ for tokens in sentences:
 			y_sentence = []
 			for index in other_indexes:
 				y_sentence.append('other')
+		for i in range(len(tokens)):
+			predictions_dict[tokens[i]] = y_sentence[i]
 		y.append(y_sentence)
 # Flatten y list
 y = [item for y_sent in y for item in y_sent]
@@ -145,4 +148,7 @@ print(f1)
 conf_matrix = confusion_matrix(t, y)
 classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot(values_format='d')
-plt.savefig('./results/confusion_matrix_' + 'viterbi_v2.svg',format='svg')
+plt.savefig('./results/CM/confusion_matrix_' + 'viterbi_v2.svg', format='svg')
+
+# Save model output
+save_predictions(predictions_dict, './results/predictions/predictions_viterbi_v2.txt')

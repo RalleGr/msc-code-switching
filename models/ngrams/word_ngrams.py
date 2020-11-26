@@ -1,8 +1,7 @@
 from nltk.lm.preprocessing import pad_sequence
-from nltk.util import everygrams
+from nltk.util import everygrams, trigrams
 from nltk import FreqDist
 import numpy as np
-from numpy.lib import utils
 from tools.utils import printStatus
 
 class NGramModel:
@@ -26,9 +25,6 @@ class NGramModel:
 		unigrams = []
 		bigrams = []
 		trigrams = []
-		fourgrams = []
-		fivegrams = []
-		sixgrams = []
 		printStatus("Creating n-grams...")
 		j = 0
 		for sent in self.tokens_arr:
@@ -43,18 +39,10 @@ class NGramModel:
 					unigrams.append(ngram)
 				if (len(ngram) == 2 and self.n <= 3):
 					bigrams.append(ngram)
-				if (len(ngram) == 3 and self.n <= 4):
-					trigrams.append(ngram)
-				if (len(ngram) == 4 and self.n <= 5):
-					fourgrams.append(ngram)
-				if (len(ngram) == 5 and self.n <= 6):
-					fivegrams.append(ngram)
-				if (len(ngram) == 6 and self.n <= 6):
-					sixgrams.append(ngram)
 			if j % (len(self.tokens_arr)/10) == 0:
 				print(f"token {j} of {len(self.tokens_arr)}")
 			j+=1
-		return unigrams + bigrams + trigrams + fourgrams + fivegrams + sixgrams
+		return unigrams + bigrams + trigrams
 	
 	def load_ngrams_freq(self, freq_dist):
 		self.freq_dist = freq_dist
@@ -69,4 +57,15 @@ class NGramModel:
 				bigram = (s[word_index - 1], s[word_index])
 				unigram = (s[word_index - 1],)
 			prob = self.get_freq(bigram) / self.get_freq(unigram)
+		elif (self.n == 3):
+			if (word_index == 0):
+				trigram = ('<s>', '<s>', s[word_index])
+				bigram = ('<s>', '<s>')
+			elif (word_index == 1):
+				trigram = ('<w>', s[word_index - 1], s[word_index]) if len(s) >= 2 else ('<w>', s[word_index - 1], '</w>')
+				bigram = ('<w>', s[word_index - 1])
+			else:
+				trigram = (s[word_index - 2], s[word_index - 1], s[word_index])
+				bigram = (s[word_index - 2], s[word_index - 1])
+			prob = self.get_freq(trigram) / self.get_freq(bigram)
 		return np.log(prob)

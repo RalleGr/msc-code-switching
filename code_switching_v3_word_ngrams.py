@@ -8,14 +8,15 @@ from sklearn.metrics import confusion_matrix
 from models.ngrams.word_ngrams import NGramModel
 from tools.utils import is_other
 from tools.utils import printStatus
+from tools.utils import save_predictions
+import sys
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
-# n = int(sys.argv[1])
-# if n!=2 and n!=3 and n!=4 and n!=5 and n!=6:
-# 	print("n should be 2, 3, 4, 5 or 6")
-# 	exit(1)
-n = 2
+n = int(sys.argv[1])
+if n!=2 and n!=3 and n!=4 and n!=5 and n!=6:
+	print("n should be 2, 3, 4, 5 or 6")
+	exit(1)
 
 # Get dictionaries
 printStatus("Getting dictionaries...")
@@ -59,6 +60,7 @@ file.close()
 
 # Choose language with highest probability for each word based on ngrams
 y = []
+predictions_dict = dict()
 counter = 0
 printStatus("Classifying...")
 for s in sentences:
@@ -74,6 +76,7 @@ for s in sentences:
 			else:
 				lang = 'lang2'
 		y.append(lang)
+		predictions_dict[s[word_index]] = lang
 
 	if counter % 10000 == 0:
 		print(f"{counter} of {len(sentences)}")
@@ -82,7 +85,7 @@ for s in sentences:
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
-# 0.4984176013368104 # with unigrams and bigrams
+# 0.4984176013368104 # with word unigrams and bigrams
 
 # Fq score
 f1 = f1_score(t, y, average=None)
@@ -92,4 +95,7 @@ print(f1)
 conf_matrix = confusion_matrix(t, y)
 classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot(values_format='d')
-plt.savefig('./results/confusion_matrix_' + str(n) + '_grams_words.svg',format='svg')
+plt.savefig('./results/CM/confusion_matrix_' + str(n) + '_grams_words.svg',format='svg')
+
+# Save model output
+save_predictions(predictions_dict, './results/predictions/predictions_word_' + str(n) + '_grams.txt')

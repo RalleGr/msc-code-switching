@@ -4,6 +4,7 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from tools.utils import is_other
+from tools.utils import save_predictions
 from tools.utils import printStatus
 from sklearn.feature_extraction.text import CountVectorizer
 from sklearn.decomposition import LatentDirichletAllocation as LDA
@@ -13,7 +14,7 @@ from sklearn.decomposition import LatentDirichletAllocation as LDA
 
 # Get data
 printStatus("Getting test data...")
-filepath = 'datasets/bilingual-annotated/dev.conll'
+filepath = 'datasets/bilingual-annotated/train.conll'
 file = open(filepath, 'rt', encoding='utf8')
 words = []
 t = []
@@ -59,27 +60,33 @@ for i in range(len(words_not_other)):
 		topic = 'lang2'
 	words_dict[words_not_other[i]] = topic
 
-predicted = []
+y = []
+predictions_dict = dict()
 for word in words:
 	if(is_other(word)):
-		predicted.append('other')
+		lang = 'other'
 	else:
-		predicted.append(words_dict[word])
+		lang = words_dict[word]
+	y.append(lang)
+	predictions_dict[word] = lang
 
 # Get accuracy
-acc = accuracy_score(t, predicted)
+acc = accuracy_score(t, y)
 print(acc)
 
 # Fq score
-f1 = f1_score(t, predicted, average=None)
+f1 = f1_score(t, y, average=None)
 print(f1)
 
 # Confusion matrix
-conf_matrix = confusion_matrix(t, predicted)
+conf_matrix = confusion_matrix(t, y)
 classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 					   display_labels=classes).plot(values_format='d')
-plt.savefig('./results/confusion_matrix_LDA.svg', format='svg')
+plt.savefig('./results/CM/confusion_matrix_LDA_v1.svg', format='svg')
+
+# Save model output
+save_predictions(predictions_dict, './results/predictions/predictions_LDA_v1.txt')
 
 # Using 'dev' dataset
 # Range 3-7 
@@ -117,6 +124,6 @@ plt.savefig('./results/confusion_matrix_LDA.svg', format='svg')
 # Range 1-4
 # 0.57299634321272
 # [0.46323118 0.49383586 0.91109107]
-# Range 3-3
+# Range 3-3 - best
 # 0.6626421803341617
 # [0.47662609 0.66587381 0.91109107]

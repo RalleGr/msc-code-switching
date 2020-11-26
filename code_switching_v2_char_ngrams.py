@@ -6,6 +6,7 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from models.ngrams.ngrams import NGramModel
+from tools.utils import save_predictions
 from tools.utils import is_other
 from tools.utils import printStatus
 import sys
@@ -53,6 +54,7 @@ file.close()
 
 # Choose language with highest probability for each word based on ngrams
 y = []
+predictions_dict = dict()
 counter = 0
 printStatus("Classifying...")
 for word in words:
@@ -62,14 +64,13 @@ for word in words:
 	else:
 		prob_en = model_en.get_word_log_prob(word)
 		prob_es = model_es.get_word_log_prob(word)
-		# print(f"EN: {word} : {prob_en}")
-		# print(f"ES: {word} : {prob_es}")
 		if (prob_en >= prob_es):
 			lang = 'lang1'
 		else:
 			lang = 'lang2'
 	
 	y.append(lang)
+	predictions_dict[word] = lang
 
 	if counter % 10000 == 0:
 		print(f"{counter} of {len(words)}")
@@ -80,13 +81,11 @@ acc = accuracy_score(t, y)
 print(acc)
 # 0.3306321355653757 # first try with unigrams and bigrams
 # 0.7512812260156966 # after fixing bug (string type vs. tuple type)
-# 0.7647990889059444 # using bigrams and trigrams
-# 0.7778960659552870 # using unigrams and bigrams, fixed bug when ngrams are skipped (explain on old code)
-# 0.8583347775494541 # using bigrams and trigrams on fixed code
-# 0.8786610878661087 # using trigrams and 4 grams
-# 0.8901983115050383 # using 4 grams and 5 grams
-# 0.8892079918793790 # using 5 grams and 6 grams
-# 0.9113856748613819 # completely ignoring ne, unk, ambiguous, mixed, etc.
+# 0.7955034559586804 # using unigrams and bigrams
+# 0.8777628680659291 # using bigrams and trigrams
+# 0.9003721801655822 # using trigrams grams and 4 grams
+# 0.9113856748613819 # using 4 grams and 5 grams - best
+# 0.9095374332227764 # using 5 grams and 6 grams
 
 # Fq score
 f1 = f1_score(t, y, average=None)
@@ -96,4 +95,7 @@ print(f1)
 conf_matrix = confusion_matrix(t, y)
 classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot(values_format='d')
-plt.savefig('./results/confusion_matrix_' + str(n) + '_grams.svg',format='svg')
+plt.savefig('./results/CM/confusion_matrix_char_' + str(n) + '_grams.svg', format='svg')
+
+# Save model output
+save_predictions(predictions_dict, './results/predictions/predictions_char_' + str(n) + '_grams.txt')

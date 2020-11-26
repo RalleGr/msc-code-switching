@@ -4,6 +4,8 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
+from tools.utils import save_predictions
+from tools.utils import is_other
 
 DICTIONARIES_PATH = "./dictionaries/word-level/"
 
@@ -27,58 +29,38 @@ for line in file:
 	if (line.strip() is not '' and '# sent_enum' not in line):
 		line = line.rstrip('\n')
 		splits = line.split("\t")
-		words.append(splits[0])
-		t.append(splits[1])
+		if (splits[1]=='ambiguous' or splits[1]=='fw' or splits[1]=='mixed' or splits[1]=='ne' or splits[1]=='unk'):
+			continue
+		else:
+			words.append(splits[0])
+			t.append(splits[1])
 file.close()
 
 # Choose language with highest probability for each word
 y = []
+predictions_dict = dict()
 for word in words:
 	word = word.lower()
-	if word in probability_en_dict:
-		prob_en = probability_en_dict[word]
-	else:
-		prob_en = 0
 
-	if word in probability_es_dict:
-		prob_es = probability_es_dict[word]
-	else:
-		prob_es = 0
+	# Get EN prob
+	if word in probability_en_dict: prob_en = probability_en_dict[word]
+	else: prob_en = probability_en_dict['OOV']
 
-	if word in probability_other_dict:
-		prob_other = probability_other_dict[word]
-	else:
-		prob_other = 0
+	# Get ES prob
+	if word in probability_es_dict: prob_es = probability_es_dict[word]
+	else: prob_es = probability_es_dict['OOV']
 
-
-	if(prob_en == 0 and prob_es == 0 and prob_other == 0):
-		lang = 'unk'
-	else:
-		if (prob_en >= prob_es) and (prob_en >= prob_other):
-			lang = 'lang1'
-		elif (prob_es >= prob_en) and (prob_es >= prob_other):
-			lang = 'lang2'
-		else:
-			lang = 'other'
-	y.append(lang)
-
-	"""
-	if(prob_en == 0 and prob_es == 0):
+	# Assign class based on regex or class with highest prob
+	if (is_other(word)):
 		lang = 'other'
 	else:
-		lang = 'lang1' if (prob_en > prob_es) else 'lang2'
-	"""
-	"""
-	try:
-		prob_en = probability_en_dict[word]
-		prob_es = probability_es_dict[word]
-		lang = 'lang1' if (prob_en > prob_es) else 'lang2'
-		y.append(lang)
-	except:
-		# TODO need 2 categories, one for punctuation marks and one for unknown words, now both are 'other'
-		y.append('other')
-		# print(f"{word} doesn't exist in dictionaries")
-	"""
+		if (prob_en >= prob_es):
+			lang = 'lang1'
+		else:
+			lang = 'lang2'
+
+	y.append(lang)
+	predictions_dict[word] = lang
 
 # Get accuracy
 acc = accuracy_score(t, y)
@@ -88,6 +70,7 @@ print(acc)
 # 0.7658330075309709 # after implementing tokenizer
 # 0.6598583845731594 # after using "other" dictionary
 # 0.7861899928201828 # after better tokenization
+# 0.9030559282983518 # after using just 3 classes and smoothing
 
 # Fq score
 f1 = f1_score(t, y, average=None)
@@ -95,7 +78,9 @@ print(f1)
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)
-classes = ['ambiguous', 'fw', 'lang1', 'lang2', 'mixed', 'ne', 'other', 'unk']
+classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot(values_format='d')
-plt.savefig("./results/confusion_matrix.svg",format='svg')
+plt.savefig('./results/CM/confusion_matrix_probabilities.svg', format='svg')
 
+# Save model output
+save_predictions(predictions_dict, './results/predictions/predictions_probabilities.txt')

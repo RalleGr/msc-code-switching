@@ -1,6 +1,7 @@
 import csv
 import emoji
 import string
+import json
 from datetime import datetime
 
 def write_dict(DICTIONARIES_PATH, frequency_dict, freq_dict_filename, probability_dict=None, probability_dict_filename=''):
@@ -44,3 +45,9 @@ def printStatus(status):
 	now = datetime.now()
 	current_time = now.strftime("%H:%M:%S")
 	print(f"[{current_time}] {status}")
+
+def save_predictions(predictions, file_name):
+	"""Saves the language model to the specified file in JSON format"""
+	with open(file_name, "w") as f:
+		json.dump(predictions, f)
+	printStatus('Predictions saved at: ' + file_name)

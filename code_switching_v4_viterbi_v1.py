@@ -1,9 +1,12 @@
-from os import closerange
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from models.viterbi.viterbi_identifier import ViterbiIdentifier
 from tools.utils import is_other
 from tools.utils import printStatus
+from tools.utils import save_predictions
+from sklearn.metrics import ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix
+import matplotlib.pyplot as plt
 
 WORD_DICTIONARIES_PATH = "./dictionaries/word-level/"
 VITERBI_DICTIONARIES_PATH = "./dictionaries/viterbi/"
@@ -50,21 +53,29 @@ for line in file:
 file.close()
 
 y = []
+predictions_dict = dict()
 for tokens in sentences:
 	if(len(tokens) > 0):
+		# Separate 'lang' words from 'other' words
 		lang_tokens = []
 		other_indexes = []
 		for i in range(len(tokens)):
 			if (is_other(tokens[i])): other_indexes.append(i)
 			else: lang_tokens.append(tokens[i])
+		
+		# For sentences with 'lang1', 'lang2' and 'other' words
 		if(len(lang_tokens) > 0):
 			y_sentence = identifier.identify(lang_tokens)
 			for index in other_indexes:
 				y_sentence.insert(index, 'other')
+
+		# For sentences that are made up only of 'other' words
 		else:
 			y_sentence = []
 			for index in other_indexes:
 				y_sentence.append('other')
+		for i in range(len(tokens)):
+			predictions_dict[tokens[i]] = y_sentence[i]
 		y.append(y_sentence)
 
 # Flatten y list
@@ -73,10 +84,19 @@ y = [item for y_sent in y for item in y_sent]
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
-# 0.9447299794921133 # with 2grams
+# 0.9447299794921133 # with 2grams - best
 # 0.9437678811048941 # with 3grams
 # 0.9401220345849052 # with 4grams - stop here
 
 # Fq score
 f1 = f1_score(t, y, average=None)
 print(f1)
+
+# Confusion matrix
+conf_matrix = confusion_matrix(t, y)
+classes = ['lang1', 'lang2', 'other']
+ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plot(values_format='d')
+plt.savefig('./results/CM/confusion_matrix_' + 'viterbi_v1.svg', format='svg')
+
+# Save model output
+save_predictions(predictions_dict, './results/predictions/predictions_viterbi_v1.txt')

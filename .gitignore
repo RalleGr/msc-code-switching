@@ -1,7 +1,9 @@
 .vscode
 **/__pycache__
 /**/__pycache__
-tokenized_sentences_en.p
-tokenized_sentences_es.p
+dictionaries/word-level/tokenized_sentences_en.p
+dictionaries/word-level/tokenized_sentences_es.p
 dictionaries/word-level/2_grams_word_dict_en.csv
 dictionaries/word-level/2_grams_word_dict_es.csv
+dictionaries/character-level/6_grams_dict_en.csv
+dictionaries/character-level/6_grams_dict_es.csv
