@@ -10,7 +10,7 @@ predictionsFileNames = [
 	'predictions_viterbi_v2.txt',
 	'predictions_LDA_v1.txt',
 	# 'predictions_LDA_v2.txt',
-	# 'predictions_SVM.txt',
+	'predictions_SVM.txt',
 	'predictions_LogisticRegression.txt',
 ]
 

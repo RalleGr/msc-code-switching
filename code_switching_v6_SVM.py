@@ -76,6 +76,7 @@ print(acc)
 # Fq score
 f1 = f1_score(t, y, average=None)
 print(f1)
+#[0.89405399 0.85519743 0.93879938]
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)
