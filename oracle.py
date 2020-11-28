@@ -37,21 +37,15 @@ file.close()
 nr_words = len(words)
 nr_predictions = len(results)
 
-# Create a list of dict elements: {'lang1': nr_of_predictions, 'lang2': nr_of_predictions, 'other': nr_of_predictions}
-results_dict = []
-labels = ['lang1', 'lang2', 'other'] 
+predictions = []
 for i in range(nr_words):
-	results_dict.append({key: 0 for key in labels})
-
-for i in range(nr_words):
+	predicted_label = ""
 	for j in range(nr_predictions):
 		word = words[i]
 		predicted_label = results[j][word]
-		results_dict[i][predicted_label] += 1
-
-predictions = []
-for word in results_dict:
-	predictions.append(max(word.items(), key=operator.itemgetter(1))[0])
+		if(predicted_label == t[i]):
+			break
+	predictions.append(predicted_label)
 
 # Get accuracy
 acc = accuracy_score(t, predictions)
@@ -66,4 +60,5 @@ conf_matrix = confusion_matrix(t, predictions)
 classes = ['lang1', 'lang2', 'other']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 					   display_labels=classes).plot(values_format='d')
-plt.savefig('./results/CM/confusion_matrix_majority_voting.svg', format='svg')
+plt.savefig('./results/CM/confusion_matrix_oracle.svg', format='svg')
+		
