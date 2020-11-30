@@ -13,6 +13,15 @@ import pandas as pd
 # sources: https://towardsdatascience.com/end-to-end-topic-modeling-in-python-latent-dirichlet-allocation-lda-35ce4ed6b3e0
 # https://github.com/kapadias/mediumposts/blob/master/nlp/published_notebooks/Introduction%20to%20Topic%20Modeling.ipynb
 
+WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
+
+printStatus("Getting dictionaries...")
+probability_en_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_en.csv', encoding='utf-16')
+probability_en_dict = probability_en_df.set_index('word')['probability'].to_dict()
+
+probability_es_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_es.csv', encoding='utf-16')
+probability_es_dict = probability_es_df.set_index('word')['probability'].to_dict()
+
 # Get training dictionaries
 printStatus("Getting tokenized sentences...")
 tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_en.p')
@@ -52,7 +61,7 @@ for word in dev_words:
 
 # Convert a collection of words to a matrix of token counts
 printStatus("Counting ngrams...")
-count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 4))
+count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5))
 count_train_data = count_vectorizer.fit_transform(X_train)
 count_dev_data = count_vectorizer.transform(dev_words_not_other)
 
@@ -63,6 +72,40 @@ number_topics = 2
 lda_model = LDA(n_components=number_topics)
 lda_model.fit(count_train_data)
 lda = lda_model.transform(count_dev_data)
+
+# Decide labels that belong to each cluster
+cluster_0_label = ''
+cluster_1_label = ''
+# Get indexes of words that represent better cluster 0
+cluster_0 = lda[:,0]
+top_n_words_c0_idx = (-cluster_0).argsort()[:10]
+# Check in which language these words belong to
+count_lang1 = 0
+count_lang2 = 0
+
+for i in top_n_words_c0_idx:
+	word = dev_words_not_other[i]
+
+	# Get EN prob
+	if word in probability_en_dict: prob_en = probability_en_dict[word]
+	else: prob_en = probability_en_dict['OOV']
+
+	# Get ES prob
+	if word in probability_es_dict: prob_es = probability_es_dict[word]
+	else: prob_es = probability_es_dict['OOV']
+
+	# Assign class based on regex or class with highest prob
+	if (prob_en >= prob_es):
+		count_lang1 += 1
+	else:
+		count_lang2 += 1
+
+if(count_lang1>=count_lang2):
+	cluster_0_label = 'lang1'
+	cluster_1_label = 'lang2'
+else: 
+	cluster_1_label = 'lang2'
+	cluster_2_label = 'lang1'
 
 # Predict
 printStatus("Predicting...")
@@ -92,6 +135,7 @@ print(acc)
 f1 = f1_score(t, y, average=None)
 print(f1)
 
+
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)
 classes = ['lang1', 'lang2', 'other']
@@ -102,6 +146,7 @@ plt.savefig('./results/CM/confusion_matrix_LDA_v2.svg', format='svg')
 # Save model output
 save_predictions(predictions_dict, './results/predictions/predictions_LDA_v2.txt')
 
+
 # Range 3-3
 # 0.5841962680709928
 # [0.43054036 0.54981203 0.93879938]
@@ -111,3 +156,11 @@ save_predictions(predictions_dict, './results/predictions/predictions_LDA_v2.txt
 # Range 1-5
 # 0.6334911512266754
 # [0.57470909 0.54400767 0.93879938]
+
+# ---------After adding label decision-----------
+# Range 1-5
+# 0.6621009190571436
+# [0.62412405 0.56280972 0.93879938]
+# Range 1-4 
+# 0.6161227434995062
+# [0.56187088 0.51251668 0.93879938]

@@ -134,7 +134,7 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 plt.savefig('./results/CM/confusion_matrix_LDA_v1.svg', format='svg')
 
 # Save model output
-#save_predictions(predictions_dict, './results/predictions/predictions_LDA_v1.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_LDA_v1.txt')
 
 
 # Using 'dev' dataset
@@ -189,8 +189,8 @@ plt.savefig('./results/CM/confusion_matrix_LDA_v1.svg', format='svg')
 # 0.5523710661569233
 # [0.46813166 0.44946379 0.93879938]
 # Range 2-2 
-# 0.6306301744436287
-# [0.55946873 0.55264067 0.93879938]
+# 0.5697394738840925
+# [0.47148706 0.48893527 0.93879938]
 # Range 3-3 
 # 0.5693090614477049
 # [0.4168786  0.52918593 0.93879938]
@@ -210,8 +210,8 @@ plt.savefig('./results/CM/confusion_matrix_LDA_v1.svg', format='svg')
 # 0.5605742208268982
 # [0.50596277 0.42718642 0.93879938]
 # Range 1-5 - best
-# 0.6578221130718789
-# [0.60708365 0.57100601 0.93879938]
+# 0.6091855077600831
+# [0.53772767 0.52085063 0.93879938]
 # Range 1-6
 # 0.5514849229055371
 # [0.45989006 0.45556157 0.93879938]
