@@ -8,11 +8,28 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 
+PREDICTIONS_PATH = './results/predictions/'
+
+predictionsFileNames = [
+	'predictions_probabilities.txt',
+	'predictions_2_grams.txt',
+	'predictions_3_grams.txt',
+	'predictions_4_grams.txt',
+	'predictions_5_grams.txt',
+	'predictions_6_grams.txt',
+	'predictions_word_2_grams.txt',
+	'predictions_viterbi_v1.txt',
+	'predictions_viterbi_v2.txt',
+	'predictions_LDA_v1.txt',
+	'predictions_LDA_v2.txt',
+	'predictions_SVM.txt',
+	'predictions_LogisticRegression.txt',
+]
+
 # Read all results
 results = []
-dir = "./results/predictions/"
-for file in os.listdir(dir):
-	file_path = os.path.join(dir, file)
+for file in predictionsFileNames:
+	file_path = os.path.join(PREDICTIONS_PATH, file)
 	with open(file_path, 'r') as file:
   		results.append(json.load(file))
 
@@ -62,3 +79,10 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 					   display_labels=classes).plot(values_format='d')
 plt.savefig('./results/CM/confusion_matrix_oracle.svg', format='svg')
 		
+# Using all outcomes
+# 0.9759222219409069
+# [0.99367525 0.9752323  0.93879938]
+
+# Using probabilities, 5grams, viterbi_v2, SVM, LogisticRegression
+# 0.9680482061928755
+# [0.98435721 0.96493781 0.93879938]
