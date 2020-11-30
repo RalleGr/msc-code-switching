@@ -99,12 +99,15 @@ class ViterbiIdentifier:
 		if word == self.IGNORE:
 			return {self.EN: 1, self.ES: 1}
 
+		# Get frequency probability (lex_score) and bigram probability (char_score) for word
 		lex_score, char_score = {}, {}
 		for lang in [self.EN, self.ES]:
 			lex_score[lang] = math.exp(self.model[lang].lex_score(word))
 			char_score[lang] = math.exp(self.model[lang].char_score(word))
 
-		# Relative scores, only these can be weighted
+		# Relative scores:
+		# Lex and char score for a word, divided by the sum of the lex / char scores for EN and ES
+		# How likely it is that the word is in EN compared to ES
 		lex_score_rel, char_score_rel = {}, {}
 		for lang in [self.EN, self.ES]:
 			lex_score_rel[lang] = lex_score[lang] / (lex_score[self.EN] +
