@@ -59,11 +59,11 @@ def get_probability_dict(frequency_dict):
 # EN
 
 # Uncomment this to get frequency dict from monolingual datasets
-# frequency_dict_en, other_dict_en = get_frequency_dict('en')
+frequency_en_dict, other_dict_en = get_frequency_dict('en')
 
 # Uncomment this to get existing frequency dict
-frequency_en_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_en.csv', encoding='utf-16')
-frequency_en_dict = frequency_en_df.set_index('word')['frequency'].to_dict()
+# frequency_en_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_en.csv', encoding='utf-16')
+# frequency_en_dict = frequency_en_df.set_index('word')['frequency'].to_dict()
 
 # Probability dict
 probability_dict_en = get_probability_dict(frequency_en_dict)
@@ -71,11 +71,11 @@ write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_en_dict, 'frequency_dict_en',
 
 # ES
 # Uncomment this to get frequency dict from monolingual datasets
-# frequency_dict_es, other_dict_es = get_frequency_dict('es')
+frequency_es_dict, other_dict_es = get_frequency_dict('es')
 
 # Uncomment this to get existing frequency dict
-frequency_es_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_es.csv', encoding='utf-16')
-frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
+# frequency_es_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_es.csv', encoding='utf-16')
+# frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
 
 # Probability dict
 probability_dict_es = get_probability_dict(frequency_es_dict)

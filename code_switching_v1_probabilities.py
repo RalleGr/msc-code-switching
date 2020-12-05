@@ -20,7 +20,8 @@ probability_other_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_other.csv
 probability_other_dict = probability_other_df.set_index('word')['probability'].to_dict()
 
 # Get data
-filepath = 'datasets/bilingual-annotated/dev.conll'
+# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+filepath = 'datasets/bilingual-annotated/train.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 words = []
 t = []
@@ -71,6 +72,14 @@ print(acc)
 # 0.6598583845731594 # after using "other" dictionary
 # 0.7861899928201828 # after better tokenization
 # 0.9030559282983518 # after using just 3 classes and smoothing
+
+# dev set - after is_other improvement
+# 0.9138921943438743
+# [0.91054322 0.88774562 0.96758294]
+
+# test set
+# 0.8930302566457472
+# [0.88149196 0.85917539 0.9704282 ]
 
 # Fq score
 f1 = f1_score(t, y, average=None)
