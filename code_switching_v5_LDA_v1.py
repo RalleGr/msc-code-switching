@@ -57,10 +57,10 @@ count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5))
 count_data = count_vectorizer.fit_transform(words_not_other)
 
 
-# Create and fit the LDA model - where the magic happens :)
+# Create and fit the LDA model
 printStatus("Training LDA...")
 number_topics = 2
-lda_model = LDA(n_components=number_topics)
+lda_model = LDA(n_components=number_topics, max_iter=100, random_state=123)
 lda = lda_model.fit_transform(count_data)
 
 

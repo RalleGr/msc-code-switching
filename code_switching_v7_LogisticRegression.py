@@ -31,7 +31,7 @@ count_data = count_vectorizer.fit_transform(X_train)
 
 # Create and fit the SVM model
 printStatus("Training Logistic Regression...")
-logist_regression = LogisticRegression(max_iter=1000)
+logist_regression = LogisticRegression(max_iter=1000, random_state=123)
 logist_regression.fit(count_data, t_train)
 
 # Get test data

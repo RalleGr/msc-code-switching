@@ -1,4 +1,5 @@
 import csv
+import regex
 import emoji
 import string
 import json
@@ -24,16 +25,26 @@ def is_other(word):
 			return True
 		except ValueError:
 			return False
+	
+	special_punct = ['¡', '¿', '“', '”', '…', "'", '']
+	for sp in special_punct:
+		if word == sp:
+			return True
 
-	if word in emoji.UNICODE_EMOJI or word.isnumeric() or isfloat(word):
+	if word.isnumeric() or isfloat(word):
 		return True
 
-	if '\n' in word:
+	if '\n' in word or '\t' in word:
 		return True
-		
+
 	for c in word:
 		if c in string.punctuation and c is not "\'":
 			return True
+	
+	flags = regex.findall(u'[\U0001F1E6-\U0001F1FF]', word)
+	if any(char in emoji.UNICODE_EMOJI for char in word) or '♡' in word or len(flags) > 0:
+		return True
+
 	return False
 
 # Python code to merge dict using update() method

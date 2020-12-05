@@ -7,6 +7,7 @@ from tools.utils import is_other
 from tools.utils import save_predictions
 from tools.utils import printStatus
 from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import LatentDirichletAllocation as LDA
 import pandas as pd
 
@@ -61,15 +62,16 @@ for word in dev_words:
 
 # Convert a collection of words to a matrix of token counts
 printStatus("Counting ngrams...")
-count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5))
+# tfidf_vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(1, 5), binary=False)
+count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
 count_train_data = count_vectorizer.fit_transform(X_train)
 count_dev_data = count_vectorizer.transform(dev_words_not_other)
 
 
-# Create and fit the LDA model - where the magic happens :)
+# Create and fit the LDA model
 printStatus("Training LDA...")
 number_topics = 2
-lda_model = LDA(n_components=number_topics)
+lda_model = LDA(n_components=number_topics, max_iter=100, random_state=123)
 lda_model.fit(count_train_data)
 lda = lda_model.transform(count_dev_data)
 
@@ -158,9 +160,12 @@ save_predictions(predictions_dict, './results/predictions/predictions_LDA_v2.txt
 # [0.57470909 0.54400767 0.93879938]
 
 # ---------After adding label decision-----------
-# Range 1-5
+# Range 1-5 - best
 # 0.6621009190571436
 # [0.62412405 0.56280972 0.93879938]
-# Range 1-4 
-# 0.6161227434995062
-# [0.56187088 0.51251668 0.93879938]
+
+# binary=True
+# 0.518393802060916
+# [0.44716701 0.38363071 0.93879938]
+
+# --------- fdidf vectorizer -----------

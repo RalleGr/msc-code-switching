@@ -73,22 +73,23 @@ class ViterbiIdentifier:
 				# Get max and argmax for current position
 				term = (V[t-1][lang2] + math.log(trans_p[lang2][lang]) + scores[lang]
 						for lang2 in langs)
-				maxlang, prob = self.max_argmax(term)
+				maxlang_index, prob = self.max_argmax(term)
 				V[t][lang] = prob
-				S[t][lang] = langs[maxlang]
+				S[t][lang] = langs[maxlang_index] # save lang1 or lang2
 
 		# Get argmax for final token
 		languages = [0] * len(tokens)
-		languages[-1] = langs[self.max_argmax(V[-1][lang] for lang in langs)[0]]
+		languages[-1] = langs[self.max_argmax(V[-1][lang] for lang in langs)[0]] # Use V instead of S to get lang of last token - for 1 word sequences the loop at line 67 is not entered, only have start probabilities, so S is never instantiated with a value
 
 		# Reconstruct optimal path
-		for t in range(len(tokens)-1, 0, -1):
+		for t in range(len(tokens) - 1, 0, -1):
 			languages[t-1] = S[t][languages[t]]
 
 		return languages
 
 	def max_argmax(self, iterable):
-		"""Returns the tuple (argmax, max) for a list
+		"""Returns the tuple (argmax, max) for a list,
+			where argmax is the index of the maximum value and max is the value itself
 		"""
 		return max(enumerate(iterable), key=lambda x: x[1])
 
