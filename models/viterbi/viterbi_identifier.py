@@ -34,8 +34,8 @@ class ViterbiIdentifier:
 		self.model[self.ES] = ViterbiLanguageModel.load(model_file_es, lex_file_es, lex_weight)
 
 	def identify(self, tokens,
-				 transition_probability=0.78,
-				 start_probability=0.75):
+				 transition_probability=0.75,
+				 start_probability=0.6):
 		"""Context-dependent word level language identification using Viterbi.
 
 		Assigns the most likely language to each token according to both language
