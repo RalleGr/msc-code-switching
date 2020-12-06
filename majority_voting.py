@@ -12,20 +12,24 @@ import itertools
 
 PREDICTIONS_PATH = './results/predictions/'
 
+# predictionsFileNames = [
+# 	'predictions_val_probabilities.txt',
+# 	'predictions_val_char_5_grams.txt',
+# 	# 'predictions_val_word_2_grams.txt',
+# 	'predictions_val_viterbi_v1.txt',
+# 	'predictions_val_LDA_v2.txt',
+# 	# 'predictions_val_SVM.txt',
+# 	'predictions_val_LogisticRegression.txt',
+# ]
+
 predictionsFileNames = [
-	'predictions_probabilities.txt',
-	# 'predictions_2_grams.txt',
-	#'predictions_3_grams.txt',
-	#'predictions_4_grams.txt',
-	'predictions_5_grams.txt',
-	#'predictions_6_grams.txt',
-	'predictions_word_2_grams.txt',
-	'predictions_viterbi_v1.txt',
-	#'predictions_viterbi_v2.txt',
-	#'predictions_LDA_v1.txt',
-	'predictions_LDA_v2.txt',
-	'predictions_SVM.txt',
-	'predictions_LogisticRegression.txt',
+	'predictions_test_probabilities.txt',
+	'predictions_test_char_5_grams.txt',
+	# 'predictions_test_word_2_grams.txt',
+	'predictions_test_viterbi_v1.txt',
+	'predictions_test_LDA_v2.txt',
+	'predictions_test_SVM.txt',
+	# 'predictions_test_LogisticRegression.txt',
 ]
 
 # perms = list(itertools.permutations(predictionsFileNames, r=5))
@@ -33,7 +37,8 @@ perms = [predictionsFileNames]
 
 # Get data
 printStatus("Getting test data...")
-filepath = 'datasets/bilingual-annotated/dev.conll'
+# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+filepath = 'datasets/bilingual-annotated/train.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 words = []
 t = []
@@ -88,7 +93,7 @@ for perm in perms:
 		best_ensembly = perm
 
 print(best_ensembly)
-print('Best accuracy: ', best_acc)
+print(best_acc)
 
 # Fq score
 f1 = f1_score(t, best_predictions, average=None)
@@ -101,24 +106,47 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 					   display_labels=classes).plot(values_format='d')
 plt.savefig('./results/CM/confusion_matrix_majority_voting.svg', format='svg')
 
-# Using all outcomes
-# 0.9216649365774616
-# [0.92103304 0.91323755 0.93879938]
+# RESULTS
 
-# Using probabilities, 5grams, viterbi_v2, SVM, LogisticRegression
-# 0.922677671721903
-# [0.92406337 0.91239635 0.93879938]
+# Validation set
 
-# All 7 models: ['predictions_probabilities.txt', 'predictions_5_grams.txt', 'predictions_word_2_grams.txt', 'predictions_viterbi_v1.txt', 'predictions_LDA_v2.txt', 'predictions_SVM.txt', 'predictions_LogisticRegression.txt']
-# Best accuracy:  0.9127275489277666
-# [0.91445411 0.89661431 0.93879938]
+# All outcomes
+# 0.9274881636579994
+# [0.92509976 0.90803219 0.96758294]
 
-# Best 3 model ensemble
-# ('predictions_5_grams.txt', 'predictions_viterbi_v1.txt', 'predictions_SVM.txt')
-# Best accuracy:  0.9266020204066132
-# [0.92648121 0.9202691  0.93879938]
+# Best 3 models
+# ('predictions_val_char_5_grams.txt', 'predictions_val_viterbi_v1.txt', 'predictions_val_SVM.txt')
+# 0.9373876496949135
+# [0.93546508 0.9231036  0.96758294]
 
-# Best 5 model ensemble
-# ('predictions_probabilities.txt', 'predictions_5_grams.txt', 'predictions_viterbi_v1.txt', 'predictions_SVM.txt', 'predictions_LogisticRegression.txt')
-# Best accuracy:  0.922728308479125
-# [0.9224893  0.91442271 0.93879938]
+# Best 5 models
+# ('predictions_val_probabilities.txt', 'predictions_val_char_5_grams.txt', 'predictions_val_viterbi_v1.txt', 'predictions_val_SVM.txt', 'predictions_val_LogisticRegression.txt')
+# 0.934779856697977
+# [0.93283172 0.9189907  0.96758294]
+
+# not best, but close enough and with more different implementations
+# ['predictions_val_probabilities.txt', 'predictions_val_char_5_grams.txt', 'predictions_val_viterbi_v1.txt', 'predictions_val_LDA_v2.txt', 'predictions_val_SVM.txt']
+# 0.9301972301693799
+# [0.92787963 0.91224497 0.96758294]
+
+# Test set
+
+# All outcomes
+# 0.9062197050869942
+# [0.89455143 0.88112602 0.9704282 ]
+
+# Best 3 models
+# ('predictions_test_viterbi_v1.txt', 'predictions_test_SVM.txt', 'predictions_test_LogisticRegression.txt')
+# 0.9174957906015613
+# [0.90606911 0.89919211 0.9704282 ]
+
+# Best 5 models
+# ('predictions_test_probabilities.txt', 'predictions_test_char_5_grams.txt', 'predictions_test_viterbi_v1.txt', 'predictions_test_SVM.txt', 'predictions_test_LogisticRegression.txt')
+# 0.9152507781009235
+# [0.90410553 0.8951825  0.9704282 ]
+
+# not best, but close enough and with more different implementations
+# ['predictions_test_probabilities.txt', 'predictions_test_char_5_grams.txt', 'predictions_test_viterbi_v1.txt', 'predictions_test_LDA_v2.txt', 'predictions_test_SVM.txt']
+# 0.9067809582121537
+# [0.89515916 0.88199527 0.9704282 ]
+
