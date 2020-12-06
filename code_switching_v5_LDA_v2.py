@@ -29,14 +29,14 @@ tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_se
 tokenized_sentences_es = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_es.p')
 
 # Flatten lists, so we have a long array of strings (words)
-tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:10000]
-tokenized_sentences_es = [item for sent in tokenized_sentences_es for item in sent][:10000]
+tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:20000]
+tokenized_sentences_es = [item for sent in tokenized_sentences_es for item in sent][:20000]
 X_train = tokenized_sentences_en + tokenized_sentences_es
 
 # Get 'dev' data
 printStatus("Getting dev data...")
-filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-# filepath = 'datasets/bilingual-annotated/train.conll' # test
+# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+filepath = 'datasets/bilingual-annotated/train.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 dev_words = []
 t = []
@@ -63,8 +63,8 @@ for word in dev_words:
 
 # Convert a collection of words to a matrix of token counts
 printStatus("Counting ngrams...")
-# tfidf_vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(1, 5), binary=False)
-vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), binary=False)
+# vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
+vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(1, 5), binary=False)
 vectorized_train_data = vectorizer.fit_transform(X_train)
 vectorized_dev_data = vectorizer.transform(dev_words_not_other)
 
@@ -147,8 +147,8 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 plt.savefig('./results/CM/confusion_matrix_LDA_v2.svg', format='svg')
 
 # Save model output
-save_predictions(predictions_dict, './results/predictions/predictions_val_LDA_v2.txt')
-# save_predictions(predictions_dict, './results/predictions/predictions_test_LDA_v2.txt')
+# save_predictions(predictions_dict, './results/predictions/predictions_val_LDA_v2.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_test_LDA_v2.txt')
 
 
 # Range 3-3
@@ -171,27 +171,37 @@ save_predictions(predictions_dict, './results/predictions/predictions_val_LDA_v2
 # [0.44716701 0.38363071 0.93879938]
 
 # RESULTS
-# Validation set (10 000 words per language)
+# Validation set
+
+# 	CountVectorizer(binary=False) - 10 000 words per lang
+# 0.5350532951869762
+# [0.46861357 0.37814753 0.96758294]
+
+# 	CountVectorizer(binary=True)
+# 0.583613945362939 - 10 000 words per lang
+# [0.54220152 0.4184283  0.96758294]
 
 # 	CountVectorizer(binary=False)
-# 0.9200951971035775
-# [0.91724097 0.89768954 0.96758294]
-# 	CountVectorizer(binary=True)
-# 0.920474972782743
-# [0.9174561  0.89851113 0.96758294]
+# 0.6311365420158493 - 20 000 words per lang
+# [0.58501096 0.50172747 0.96758294]
 
-# 	TfidfVectorizer(binary=False)
-# 0.9235638149732891
-# [0.92139776 0.90215224 0.96758294]
-# 	TfidfVectorizer(binary=True)
-# 0.9241461376813429
-# [0.9219929  0.90305071 0.96758294]
+# 	CountVectorizer(binary=False)
+# 0.5337114211205914 - 30 000 words per lang
+# [0.41353994 0.43592911 0.96758294]
+
+# 	CountVectorizer(binary=False)
+# 0.5170519279945313 ---- with 100 000 words per language. why does it give worse results?
+# [0.39075903 0.41694193 0.96758294]
+
+# 	TfidfVectorizer(binary=False) - 20 000 words per lang (best, saved as .txt, very similar to CountVectorizer(binary=False) though)
+# 0.637694002076107
+# [0.58269743 0.52399839 0.96758294]
+# 	TfidfVectorizer(binary=True) - 20 000 words per lang
+# 0.6386814188419374
+# [0.58867724 0.51898777 0.96758294]
 
 # Test set
-# CountVectorizer(binary=True)
-# 0.899943874687484
-# [0.89029626 0.86940129 0.9704282 ]
 
-# TfidfVectorizer(binary=True)
-# 0.9110924026736058
-# [0.90466873 0.88314996 0.9704282 ]
+# TfidfVectorizer(binary=False)
+# 0.6481198020307158
+# [0.5947801  0.51802328 0.9704282 ]
