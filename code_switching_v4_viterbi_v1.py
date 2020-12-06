@@ -30,7 +30,8 @@ identifier = ViterbiIdentifier(en, es,
 
 # Get data
 printStatus("Getting test data...")
-filepath = './datasets/bilingual-annotated/dev.conll'
+# filepath = './datasets/bilingual-annotated/dev.conll' # validation
+filepath = './datasets/bilingual-annotated/train.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
 t = []
@@ -100,3 +101,12 @@ plt.savefig('./results/CM/confusion_matrix_' + 'viterbi_v1.svg', format='svg')
 
 # Save model output
 save_predictions(predictions_dict, './results/predictions/predictions_viterbi_v1.txt')
+
+# RESULTS
+# Validation set
+# 0.9576423525837405
+# [0.95817377 0.9517566  0.96758294]
+
+# Test set
+# 0.9368080004081841
+# [0.92870999 0.92623526 0.9704282 ]

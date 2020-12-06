@@ -85,7 +85,8 @@ data_es = {'lang2': probability_es_dict}
 emission_probabilities = merge_dictionaries(data_en, data_es)
 
 # Get data as an array of sentences, each sentence is an array of tokens
-filepath = '../msc-code-switching/datasets/bilingual-annotated/dev.conll'
+# filepath = '../msc-code-switching/datasets/bilingual-annotated/dev.conll' # validation
+filepath = '../msc-code-switching/datasets/bilingual-annotated/train.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
 t = []
@@ -152,3 +153,12 @@ plt.savefig('./results/CM/confusion_matrix_' + 'viterbi_v2.svg', format='svg')
 
 # Save model output
 save_predictions(predictions_dict, './results/predictions/predictions_viterbi_v2.txt')
+
+# RESULTS
+# Validation set
+# 0.8892067751981163
+# [0.88484199 0.85001444 0.96758294]
+
+# Test set
+# 0.8885147201387826
+# [0.87941528 0.84805895 0.9704282 ]
