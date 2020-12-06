@@ -6,7 +6,7 @@ from sklearn.metrics import confusion_matrix
 from tools.utils import is_other
 from tools.utils import save_predictions
 from tools.utils import printStatus
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.svm import LinearSVC
 import pandas as pd
@@ -27,18 +27,20 @@ t_train = t_train_en + t_train_es
 
 # Convert a collection of text documents to a matrix of token counts
 printStatus("Counting ngrams...")
-count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5))
-count_data = count_vectorizer.fit_transform(X_train)
+# vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
+vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
+vectorized_data = vectorizer.fit_transform(X_train)
 
 # Create and fit the SVM model
 printStatus("Training SVM...")
 # svm = LinearSVC()
-svm = SVC()
-svm.fit(count_data, t_train)
+svm = SVC(random_state=123)
+svm.fit(vectorized_data, t_train)
 
 # Get test data
 printStatus("Getting test data...")
-filepath = 'datasets/bilingual-annotated/dev.conll'
+# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+filepath = 'datasets/bilingual-annotated/train.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 words = []
 t = []
@@ -62,7 +64,7 @@ for word in words:
 	if(is_other(word)):
 		lang = 'other'
 	else:
-		word_vect = count_vectorizer.transform([word])
+		word_vect = vectorizer.transform([word])
 		lang = svm.predict(word_vect)[0]
 	y.append(lang)
 	predictions_dict[word] = lang
@@ -86,4 +88,34 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 plt.savefig('./results/CM/confusion_matrix_SVM.svg', format='svg')
 
 # Save model output
-save_predictions(predictions_dict, './results/predictions/predictions_SVM.txt')
+# save_predictions(predictions_dict, './results/predictions/predictions_val_SVM.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_test_SVM.txt')
+
+
+# RESULTS
+# Validation set
+
+# 	CountVectorizer(binary=False) - 10 000 words per lang
+# 0.8524951262121174
+# [0.83348071 0.8130638  0.96758294]
+
+# 	CountVectorizer(binary=True) - 10 000 words per lang
+# 0.8487986429349065
+# [0.82817932 0.80917739 0.96758294]
+
+# 	TfidfVectorizer(binary=False) - 10 000 words per lang
+# 0.8956629617439299
+# [0.88561258 0.86852914 0.96758294]
+# 	TfidfVectorizer(binary=True) - 10 000 words per lang
+# 0.8939919487556017
+# [0.88348477 0.86650164 0.96758294]
+
+# 	TfidfVectorizer(binary=True) - 100 000 words per lang (saved as .txt)
+# 0.9142466516444286
+# [0.90836723 0.89206897 0.96758294]
+
+# Test set
+
+# TfidfVectorizer(binary=True) - 100 000 words per lang
+# 0.9044594111944487
+# [0.89132306 0.88025611 0.9704282 ]
