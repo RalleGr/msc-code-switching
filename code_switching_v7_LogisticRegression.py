@@ -6,7 +6,7 @@ from sklearn.metrics import confusion_matrix
 from tools.utils import is_other
 from tools.utils import save_predictions
 from tools.utils import printStatus
-from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 import pandas as pd
 
@@ -26,17 +26,19 @@ t_train = t_train_en + t_train_es
 
 # Convert a collection of text documents to a matrix of token counts
 printStatus("Counting ngrams...")
-count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5))
-count_data = count_vectorizer.fit_transform(X_train)
+# vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
+vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
+vectorized_data = vectorizer.fit_transform(X_train)
 
 # Create and fit the SVM model
 printStatus("Training Logistic Regression...")
 logist_regression = LogisticRegression(max_iter=1000, random_state=123)
-logist_regression.fit(count_data, t_train)
+logist_regression.fit(vectorized_data, t_train)
 
 # Get test data
 printStatus("Getting test data...")
-filepath = 'datasets/bilingual-annotated/dev.conll'
+# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+filepath = 'datasets/bilingual-annotated/train.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 words = []
 t = []
@@ -60,7 +62,7 @@ for word in words:
 	if(is_other(word)):
 		lang = 'other'
 	else:
-		word_vect = count_vectorizer.transform([word])
+		word_vect = vectorizer.transform([word])
 		lang = logist_regression.predict(word_vect)[0]
 	y.append(lang)
 	predictions_dict[word] = lang
@@ -85,4 +87,33 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 plt.savefig('./results/CM/confusion_matrix_LogisticRegression.svg', format='svg')
 
 # Save model output
-save_predictions(predictions_dict, './results/predictions/predictions_LogisticRegression.txt')
+# save_predictions(predictions_dict, './results/predictions/predictions_val_LogisticRegression.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_test_LogisticRegression.txt')
+
+# RESULTS
+# Validation set
+
+# 	CountVectorizer(binary=False)
+# 0.9200951971035775
+# [0.91724097 0.89768954 0.96758294]
+# 	CountVectorizer(binary=True)
+# 0.920474972782743
+# [0.9174561  0.89851113 0.96758294]
+
+# 	TfidfVectorizer(binary=False)
+# 0.9235638149732891
+# [0.92139776 0.90215224 0.96758294]
+# 	TfidfVectorizer(binary=True)
+# 0.9241461376813429
+# [0.9219929  0.90305071 0.96758294]
+
+# Test set
+# CountVectorizer(binary=True)
+# 0.899943874687484
+# [0.89029626 0.86940129 0.9704282 ]
+
+# TfidfVectorizer(binary=True)
+# 0.9110924026736058
+# [0.90466873 0.88314996 0.9704282 ]
+
+# NOTE!!! predictions.txt are saved for TfidfVectorizer(binary=True) model

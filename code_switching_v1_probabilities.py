@@ -84,7 +84,8 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plo
 plt.savefig('./results/CM/confusion_matrix_probabilities.svg', format='svg')
 
 # Save model output
-save_predictions(predictions_dict, './results/predictions/predictions_probabilities.txt')
+# save_predictions(predictions_dict, './results/predictions/predictions_val_probabilities.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_test_probabilities.txt')
 
 # RESULTS
 # Validation (dev) set - after is_other improvement

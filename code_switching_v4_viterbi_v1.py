@@ -100,7 +100,8 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plo
 plt.savefig('./results/CM/confusion_matrix_' + 'viterbi_v1.svg', format='svg')
 
 # Save model output
-save_predictions(predictions_dict, './results/predictions/predictions_viterbi_v1.txt')
+# save_predictions(predictions_dict, './results/predictions/predictions_val_viterbi_v1.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_test_viterbi_v1.txt')
 
 # RESULTS
 # Validation set

@@ -99,7 +99,8 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plo
 plt.savefig('./results/CM/confusion_matrix_char_' + str(n) + '_grams.svg', format='svg')
 
 # Save model output
-save_predictions(predictions_dict, './results/predictions/predictions_char_' + str(n) + '_grams.txt')
+# save_predictions(predictions_dict, './results/predictions/predictions_val_char_' + str(n) + '_grams.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_test_char_' + str(n) + '_grams.txt')
 
 
 # RESULTS

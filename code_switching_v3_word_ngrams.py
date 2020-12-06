@@ -36,8 +36,8 @@ model_es.load_ngrams_freq(frequency_es_dict)
 
 # Get data
 printStatus("Getting test data...")
-filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-# filepath = 'datasets/bilingual-annotated/train.conll' # test
+# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+filepath = 'datasets/bilingual-annotated/train.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
 t = []
@@ -99,7 +99,8 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plo
 plt.savefig('./results/CM/confusion_matrix_' + str(n) + '_grams_words.svg',format='svg')
 
 # Save model output
-save_predictions(predictions_dict, './results/predictions/predictions_word_' + str(n) + '_grams.txt')
+# save_predictions(predictions_dict, './results/predictions/predictions_val_word_' + str(n) + '_grams.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_test_word_' + str(n) + '_grams.txt')
 
 # RESULTS
 # Validation set

@@ -29,13 +29,14 @@ tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_se
 tokenized_sentences_es = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_es.p')
 
 # Flatten lists, so we have a long array of strings (words)
-tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:100000]
-tokenized_sentences_es = [item for sent in tokenized_sentences_es for item in sent][:100000]
+tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:10000]
+tokenized_sentences_es = [item for sent in tokenized_sentences_es for item in sent][:10000]
 X_train = tokenized_sentences_en + tokenized_sentences_es
 
 # Get 'dev' data
 printStatus("Getting dev data...")
-filepath = 'datasets/bilingual-annotated/dev.conll'
+filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+# filepath = 'datasets/bilingual-annotated/train.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 dev_words = []
 t = []
@@ -63,17 +64,17 @@ for word in dev_words:
 # Convert a collection of words to a matrix of token counts
 printStatus("Counting ngrams...")
 # tfidf_vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(1, 5), binary=False)
-count_vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
-count_train_data = count_vectorizer.fit_transform(X_train)
-count_dev_data = count_vectorizer.transform(dev_words_not_other)
+vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), binary=False)
+vectorized_train_data = vectorizer.fit_transform(X_train)
+vectorized_dev_data = vectorizer.transform(dev_words_not_other)
 
 
 # Create and fit the LDA model
 printStatus("Training LDA...")
 number_topics = 2
 lda_model = LDA(n_components=number_topics, max_iter=100, random_state=123)
-lda_model.fit(count_train_data)
-lda = lda_model.transform(count_dev_data)
+lda_model.fit(vectorized_train_data)
+lda = lda_model.transform(vectorized_dev_data)
 
 # Decide labels that belong to each cluster
 cluster_0_label = ''
@@ -146,7 +147,8 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 plt.savefig('./results/CM/confusion_matrix_LDA_v2.svg', format='svg')
 
 # Save model output
-save_predictions(predictions_dict, './results/predictions/predictions_LDA_v2.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_val_LDA_v2.txt')
+# save_predictions(predictions_dict, './results/predictions/predictions_test_LDA_v2.txt')
 
 
 # Range 3-3
@@ -168,4 +170,28 @@ save_predictions(predictions_dict, './results/predictions/predictions_LDA_v2.txt
 # 0.518393802060916
 # [0.44716701 0.38363071 0.93879938]
 
-# --------- fdidf vectorizer -----------
+# RESULTS
+# Validation set (10 000 words per language)
+
+# 	CountVectorizer(binary=False)
+# 0.9200951971035775
+# [0.91724097 0.89768954 0.96758294]
+# 	CountVectorizer(binary=True)
+# 0.920474972782743
+# [0.9174561  0.89851113 0.96758294]
+
+# 	TfidfVectorizer(binary=False)
+# 0.9235638149732891
+# [0.92139776 0.90215224 0.96758294]
+# 	TfidfVectorizer(binary=True)
+# 0.9241461376813429
+# [0.9219929  0.90305071 0.96758294]
+
+# Test set
+# CountVectorizer(binary=True)
+# 0.899943874687484
+# [0.89029626 0.86940129 0.9704282 ]
+
+# TfidfVectorizer(binary=True)
+# 0.9110924026736058
+# [0.90466873 0.88314996 0.9704282 ]
