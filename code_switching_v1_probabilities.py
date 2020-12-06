@@ -73,14 +73,6 @@ print(acc)
 # 0.7861899928201828 # after better tokenization
 # 0.9030559282983518 # after using just 3 classes and smoothing
 
-# dev set - after is_other improvement
-# 0.9138921943438743
-# [0.91054322 0.88774562 0.96758294]
-
-# test set
-# 0.8930302566457472
-# [0.88149196 0.85917539 0.9704282 ]
-
 # Fq score
 f1 = f1_score(t, y, average=None)
 print(f1)
@@ -93,3 +85,12 @@ plt.savefig('./results/CM/confusion_matrix_probabilities.svg', format='svg')
 
 # Save model output
 save_predictions(predictions_dict, './results/predictions/predictions_probabilities.txt')
+
+# RESULTS
+# Validation (dev) set - after is_other improvement
+# 0.9138921943438743
+# [0.91054322 0.88774562 0.96758294]
+
+# Test set
+# 0.8930302566457472
+# [0.88149196 0.85917539 0.9704282 ]

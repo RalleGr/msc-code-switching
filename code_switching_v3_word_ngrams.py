@@ -36,15 +36,17 @@ model_es.load_ngrams_freq(frequency_es_dict)
 
 # Get data
 printStatus("Getting test data...")
-filepath = 'datasets/bilingual-annotated/dev.conll'
+filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+# filepath = 'datasets/bilingual-annotated/train.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
 t = []
 s = []
 for line in file:
 	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
-	if (line.strip() is not ''):
+	if (len(line.strip()) != 0):
 		if ('# sent_enum' in line):
+			sentences.append(s)
 			s = []
 		else:
 			line = line.rstrip('\n')
@@ -54,8 +56,7 @@ for line in file:
 			else:
 				s.append(splits[0].lower())
 				t.append(splits[1])
-	else:
-		sentences.append(s)
+sentences.append(s) # append last sentence
 file.close()
 
 # Choose language with highest probability for each word based on ngrams
@@ -99,3 +100,12 @@ plt.savefig('./results/CM/confusion_matrix_' + str(n) + '_grams_words.svg',forma
 
 # Save model output
 save_predictions(predictions_dict, './results/predictions/predictions_word_' + str(n) + '_grams.txt')
+
+# RESULTS
+# Validation set
+# 0.5092285490037218
+# [0.45413354 0.31975212 0.96758294]
+
+# Test set
+# 0.5144650237257002
+# [0.45770518 0.29866948 0.9704282 ]

@@ -56,6 +56,7 @@ def get_tokenized_sentences(lang):
 
 	return tokenizedFile
 
+# Write tokenized_sentences
 # tokenized_sentences_en = get_tokenized_sentences('en')
 # with open('./dictionaries/word-level/tokenized_sentences_en.p', 'wb') as fp:
 # 	pickle.dump(tokenized_sentences_en, fp)
@@ -64,6 +65,7 @@ def get_tokenized_sentences(lang):
 # with open('./dictionaries/word-level/tokenized_sentences_es.p', 'wb') as fp:
 # 	pickle.dump(tokenized_sentences_es, fp)
 
+# Read tokenized_sentences and train n-gram model
 tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_en.p')
 tokenized_sentences_es = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_es.p')
 
