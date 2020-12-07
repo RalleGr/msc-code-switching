@@ -36,7 +36,7 @@ X_train = tokenized_sentences_en + tokenized_sentences_es
 # Get 'dev' data
 printStatus("Getting dev data...")
 # filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-filepath = 'datasets/bilingual-annotated/train.conll' # test
+filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 dev_words = []
 t = []

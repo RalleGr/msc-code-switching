@@ -21,7 +21,7 @@ probability_other_dict = probability_other_df.set_index('word')['probability'].t
 
 # Get data
 # filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-filepath = 'datasets/bilingual-annotated/train.conll' # test
+filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 words = []
 t = []

@@ -86,7 +86,7 @@ emission_probabilities = merge_dictionaries(data_en, data_es)
 
 # Get data as an array of sentences, each sentence is an array of tokens
 # filepath = '../msc-code-switching/datasets/bilingual-annotated/dev.conll' # validation
-filepath = '../msc-code-switching/datasets/bilingual-annotated/train.conll' # test
+filepath = '../msc-code-switching/datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
 t = []
