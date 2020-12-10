@@ -12,9 +12,9 @@ import pickle
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
-n = 2
-if n!=2 and n!=3 and n!=4 and n!=5 and n!=6:
-	print("n should be 2, 3, 4, 5 or 6")
+n = 3
+if n!=2 and n!=3:
+	print("n should be 2 or 3")
 	exit(1)
 
 # Split dataset by sentences, each sentenced by tokens

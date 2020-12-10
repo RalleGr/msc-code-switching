@@ -62,8 +62,8 @@ class NGramModel:
 				trigram = ('<s>', '<s>', s[word_index])
 				bigram = ('<s>', '<s>')
 			elif (word_index == 1):
-				trigram = ('<w>', s[word_index - 1], s[word_index]) if len(s) >= 2 else ('<w>', s[word_index - 1], '</w>')
-				bigram = ('<w>', s[word_index - 1])
+				trigram = ('<s>', s[word_index - 1], s[word_index]) if len(s) >= 2 else ('<s>', s[word_index - 1], '</w>')
+				bigram = ('<s>', s[word_index - 1])
 			else:
 				trigram = (s[word_index - 2], s[word_index - 1], s[word_index])
 				bigram = (s[word_index - 2], s[word_index - 1])

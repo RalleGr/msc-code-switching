@@ -18,8 +18,8 @@ frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
 
 # Create ngrams frequency dictionaries
 ns = [
-	# 2,
-	# 3,
+	2,
+	3,
 	4,
 	5,
 	6,

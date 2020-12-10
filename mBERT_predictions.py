@@ -12,8 +12,8 @@ import itertools
 
 PREDICTIONS_PATH = './results/predictions/'
 
-predictionsFileName = PREDICTIONS_PATH + 'mBERT_predictions_dev.out'
-# predictionsFileName = 'mBERT_predictions_train.out' # our test dataset
+# predictionsFileName = PREDICTIONS_PATH + 'mBERT_predictions_dev.out' # validation
+predictionsFileName = PREDICTIONS_PATH + 'mBERT_predictions_test.out' # test
 
 # Get predictions
 file = open(predictionsFileName, 'rt', encoding='utf8')
@@ -30,8 +30,8 @@ file.close()
 
 # Get annotated data
 printStatus("Getting test data...")
-filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-# filepath = 'datasets/bilingual-annotated/test.conll' # test
+# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 t = []
 for line in file:
@@ -65,10 +65,10 @@ print(f1)
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t_, y_)
-classes = ['lang1', 'lang2', 'other']
+classes = ['ambiguous', 'fw', 'lang1', 'lang2', 'mixed', 'ne', 'other', 'unk']
 ConfusionMatrixDisplay(confusion_matrix=conf_matrix,
 					   display_labels=classes).plot(values_format='d')
-plt.savefig('./results/CM/mBERT.svg', format='svg')
+plt.savefig('./results/CM/mBERT_test.svg', format='svg')
 
 # RESULTS
 
@@ -77,4 +77,6 @@ plt.savefig('./results/CM/mBERT.svg', format='svg')
 # [0.   0.   0.99140693   0.99081154   0.   0.99782942   0.]
 
 # Test set
+# 0.9859431603653248
+# [0.   0.98548717   0.98404558   0.   0.99764318   0.]
 

@@ -36,8 +36,8 @@ model_es.load_ngrams_freq(frequency_es_dict)
 
 # Get data
 printStatus("Getting test data...")
-# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-filepath = 'datasets/bilingual-annotated/test.conll' # test
+filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+# filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
 t = []
@@ -99,14 +99,24 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plo
 plt.savefig('./results/CM/confusion_matrix_' + str(n) + '_grams_words.svg',format='svg')
 
 # Save model output
-# save_predictions(predictions_dict, './results/predictions/predictions_val_word_' + str(n) + '_grams.txt')
-save_predictions(predictions_dict, './results/predictions/predictions_test_word_' + str(n) + '_grams.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_val_word_' + str(n) + '_grams.txt')
+# save_predictions(predictions_dict, './results/predictions/predictions_test_word_' + str(n) + '_grams.txt')
 
 # RESULTS
 # Validation set
+# bigrams
 # 0.5092285490037218
 # [0.45413354 0.31975212 0.96758294]
 
+# trigrams
+# 0.3973719523001747
+# [0.39750632 0.02163962 0.96758294]
+
 # Test set
+# bigrams
 # 0.5144650237257002
 # [0.45770518 0.29866948 0.9704282 ]
+
+# trigrams
+# 0.4430583193020052
+# [0.45181117 0.01789812 0.9704282 ]
