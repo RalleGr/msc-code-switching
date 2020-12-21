@@ -34,11 +34,13 @@ identifier = ViterbiIdentifier(en, es,
 # Get data
 print_status("Getting test data...")
 # filepath = './datasets/bilingual-annotated/dev.conll' # validation
-filepath = './datasets/bilingual-annotated/test.conll' # test
+# filepath = './datasets/bilingual-annotated/test.conll' # test
+filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
 t = []
 s = []
+""" Own test set
 for line in file:
 	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
 	if (line.strip() is not ''):
@@ -54,6 +56,18 @@ for line in file:
 				t.append(splits[1])
 	else:
 		sentences.append(s)
+"""
+
+# Original test set
+for line in file:
+	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
+	if (line.strip() is not ''):
+		token = line.rstrip('\n')
+		s.append(token.lower())
+	else:
+		sentences.append(s)
+		s = []
+
 file.close()
 
 y = []
@@ -82,6 +96,9 @@ for tokens in sentences:
 			predictions_dict[tokens[i]] = y_sentence[i]
 		y.append(y_sentence)
 
+save_predictions(y, './results/predictions/predictions_test_original_viterbi_v1.txt')
+
+""" Own test set with labels
 # Flatten y list
 y = [item for y_sent in y for item in y_sent]
 
@@ -111,3 +128,6 @@ save_predictions(predictions_dict, './results/predictions/predictions_test_viter
 # Test set
 # 0.9368080004081841
 # [0.92870999 0.92623526 0.9704282 ]
+"""
+
+""" Original test set without labels """

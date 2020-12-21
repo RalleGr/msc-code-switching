@@ -59,6 +59,14 @@ def print_status(status):
 
 def save_predictions(predictions, file_name):
 	"""Saves the language model to the specified file in JSON format"""
-	with open(file_name, "w") as f:
-		json.dump(predictions, f)
+	if (type(predictions) == list):
+		with open(file_name, 'w') as f:
+			for sentence in predictions:
+				for label in sentence:
+					f.write("%s\n" % label)
+				f.write("\n")
+	else:
+		with open(file_name, "w") as f:
+			json.dump(predictions, f)
+
 	print_status('Predictions saved at: ' + file_name)
