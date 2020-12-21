@@ -1,4 +1,4 @@
-# Unsupervised Code-Switching Detection - MSC
+# Semi-Supervised Code-Switch Detection
 
 ## Useful links
 

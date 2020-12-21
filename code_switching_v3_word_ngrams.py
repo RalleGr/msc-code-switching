@@ -7,7 +7,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from models.ngrams.word_ngrams import NGramModel
 from tools.utils import is_other
-from tools.utils import printStatus
+from tools.utils import print_status
 from tools.utils import save_predictions
 import sys
 
@@ -19,7 +19,7 @@ if n!=2 and n!=3 and n!=4 and n!=5 and n!=6:
 	exit(1)
 
 # Get dictionaries
-printStatus("Getting dictionaries...")
+print_status("Getting dictionaries...")
 frequency_en_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_word_dict_en.csv', encoding='utf-16', converters={"word": ast.literal_eval})
 frequency_en_dict = frequency_en_df.set_index('word')['frequency'].to_dict()
 
@@ -27,7 +27,7 @@ frequency_es_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_wo
 frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
 
 # Apply ngram model to en, es and other
-printStatus("Applying NGRAM model...")
+print_status("Applying NGRAM model...")
 model_en = NGramModel(n)
 model_en.load_ngrams_freq(frequency_en_dict)
 
@@ -35,9 +35,9 @@ model_es = NGramModel(n)
 model_es.load_ngrams_freq(frequency_es_dict)
 
 # Get data
-printStatus("Getting test data...")
-filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-# filepath = 'datasets/bilingual-annotated/test.conll' # test
+print_status("Getting test data...")
+# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
+filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
 t = []
@@ -63,7 +63,7 @@ file.close()
 y = []
 predictions_dict = dict()
 counter = 0
-printStatus("Classifying...")
+print_status("Classifying...")
 for s in sentences:
 	if (len(s) == 0): continue
 	for word_index in range(len(s)):
@@ -86,7 +86,6 @@ for s in sentences:
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
-# 0.4984176013368104 # with word unigrams and bigrams
 
 # Fq score
 f1 = f1_score(t, y, average=None)
@@ -99,8 +98,8 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plo
 plt.savefig('./results/CM/confusion_matrix_' + str(n) + '_grams_words.svg',format='svg')
 
 # Save model output
-save_predictions(predictions_dict, './results/predictions/predictions_val_word_' + str(n) + '_grams.txt')
-# save_predictions(predictions_dict, './results/predictions/predictions_test_word_' + str(n) + '_grams.txt')
+# save_predictions(predictions_dict, './results/predictions/predictions_val_word_' + str(n) + '_grams.txt')
+save_predictions(predictions_dict, './results/predictions/predictions_test_word_' + str(n) + '_grams.txt')
 
 # RESULTS
 # Validation set

@@ -5,10 +5,12 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from tools.utils import is_other
-from tools.utils import printStatus
+from tools.utils import print_status
 from tools.utils import merge_dictionaries
 from tools.utils import save_predictions
 import math
+
+# Based on own implementation
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
@@ -72,13 +74,13 @@ transition_probabilities = {
 }
 
 # Emission probabilities (our probability dictionaries)
-printStatus("Getting dictionaries...")
+print_status("Getting dictionaries...")
 probability_en_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_en.csv', encoding='utf-16')
 probability_en_dict = probability_en_df.set_index('word')['probability'].to_dict()
 
 probability_es_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_es.csv', encoding='utf-16')
 probability_es_dict = probability_es_df.set_index('word')['probability'].to_dict()
-printStatus("Dictionaries ready!")
+print_status("Dictionaries ready!")
 
 data_en = {'lang1': probability_en_dict}
 data_es = {'lang2': probability_es_dict}
@@ -139,7 +141,6 @@ y = [item for y_sent in y for item in y_sent]
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
-# 0.8779654150948173
 
 # Fq score
 f1 = f1_score(t, y, average=None)

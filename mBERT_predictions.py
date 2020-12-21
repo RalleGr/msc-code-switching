@@ -1,14 +1,9 @@
-import json
-import os
-from tools.utils import printStatus
-from tools.utils import is_other
-import operator
+from tools.utils import print_status
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
-import itertools
 
 PREDICTIONS_PATH = './results/predictions/'
 
@@ -29,7 +24,7 @@ file.close()
 
 
 # Get annotated data
-printStatus("Getting test data...")
+print_status("Getting test data...")
 # filepath = 'datasets/bilingual-annotated/dev.conll' # validation
 filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')

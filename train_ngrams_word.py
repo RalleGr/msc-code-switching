@@ -5,7 +5,7 @@ from tools.utils import is_other
 import os
 from bs4 import BeautifulSoup
 import re
-from tools.utils import printStatus
+from tools.utils import print_status
 from spacy.lang.en import English
 from spacy.lang.es import Spanish
 import pickle
@@ -17,7 +17,7 @@ if n!=2 and n!=3:
 	print("n should be 2 or 3")
 	exit(1)
 
-# Split dataset by sentences, each sentenced by tokens
+# Split dataset by sentences, each sentence by tokens
 def get_tokenized_sentences(lang):
 	
 	tokenizedFile = []
@@ -26,7 +26,7 @@ def get_tokenized_sentences(lang):
 	tokenizer = nlp.Defaults.create_tokenizer(nlp)
 
 	# Load data
-	printStatus("Creating tokenized sentences from dataset...")
+	print_status("Creating tokenized sentences from dataset...")
 	for root, dirs, files in os.walk('datasets/monolingual-' + lang):
 		if ('.DS_Store' in files):
 			files.remove('.DS_Store')

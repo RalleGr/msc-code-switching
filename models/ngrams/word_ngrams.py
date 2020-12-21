@@ -2,7 +2,7 @@ from nltk.lm.preprocessing import pad_sequence
 from nltk.util import everygrams, trigrams
 from nltk import FreqDist
 import numpy as np
-from tools.utils import printStatus
+from tools.utils import print_status
 
 class NGramModel:
 	def __init__(self, n):
@@ -25,7 +25,7 @@ class NGramModel:
 		unigrams = []
 		bigrams = []
 		trigrams = []
-		printStatus("Creating n-grams...")
+		print_status("Creating n-grams...")
 		j = 0
 		for sent in self.tokens_arr:
 			words = list(pad_sequence(

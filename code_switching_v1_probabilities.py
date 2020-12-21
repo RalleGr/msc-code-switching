@@ -66,12 +66,6 @@ for word in words:
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
-# 0.6959812854571735 # first try
-# 0.7643007491479774 # after fixing bug
-# 0.7658330075309709 # after implementing tokenizer
-# 0.6598583845731594 # after using "other" dictionary
-# 0.7861899928201828 # after better tokenization
-# 0.9030559282983518 # after using just 3 classes and smoothing
 
 # Fq score
 f1 = f1_score(t, y, average=None)
@@ -88,7 +82,7 @@ plt.savefig('./results/CM/confusion_matrix_probabilities.svg', format='svg')
 save_predictions(predictions_dict, './results/predictions/predictions_test_probabilities.txt')
 
 # RESULTS
-# Validation (dev) set - after is_other improvement
+# Validation (dev) set
 # 0.9138921943438743
 # [0.91054322 0.88774562 0.96758294]
 

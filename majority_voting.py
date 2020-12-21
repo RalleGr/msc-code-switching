@@ -1,6 +1,6 @@
 import json
 import os
-from tools.utils import printStatus
+from tools.utils import print_status
 from tools.utils import is_other
 import operator
 import matplotlib.pyplot as plt
@@ -12,22 +12,24 @@ import itertools
 
 PREDICTIONS_PATH = './results/predictions/'
 
+# Validation results
 # predictionsFileNames = [
 # 	'predictions_val_probabilities.txt',
 # 	'predictions_val_char_5_grams.txt',
 # 	# 'predictions_val_word_2_grams.txt',
 # 	'predictions_val_viterbi_v1.txt',
-# 	'predictions_val_LDA_v2.txt',
+# 	'predictions_val_LDA.txt',
 # 	# 'predictions_val_SVM.txt',
 # 	'predictions_val_LogisticRegression.txt',
 # ]
 
+# Test results
 predictionsFileNames = [
 	'predictions_test_probabilities.txt',
 	'predictions_test_char_5_grams.txt',
 	# 'predictions_test_word_2_grams.txt',
 	'predictions_test_viterbi_v1.txt',
-	'predictions_test_LDA_v2.txt',
+	'predictions_test_LDA.txt',
 	'predictions_test_SVM.txt',
 	# 'predictions_test_LogisticRegression.txt',
 ]
@@ -36,7 +38,7 @@ predictionsFileNames = [
 perms = [predictionsFileNames]
 
 # Get data
-printStatus("Getting test data...")
+print_status("Getting test data...")
 # filepath = 'datasets/bilingual-annotated/dev.conll' # validation
 filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
@@ -125,7 +127,7 @@ plt.savefig('./results/CM/confusion_matrix_majority_voting.svg', format='svg')
 # [0.93283172 0.9189907  0.96758294]
 
 # not best, but close enough and with more different implementations
-# ['predictions_val_probabilities.txt', 'predictions_val_char_5_grams.txt', 'predictions_val_viterbi_v1.txt', 'predictions_val_LDA_v2.txt', 'predictions_val_SVM.txt']
+# ['predictions_val_probabilities.txt', 'predictions_val_char_5_grams.txt', 'predictions_val_viterbi_v1.txt', 'predictions_val_LDA.txt', 'predictions_val_SVM.txt']
 # 0.9301972301693799
 # [0.92787963 0.91224497 0.96758294]
 
@@ -146,7 +148,7 @@ plt.savefig('./results/CM/confusion_matrix_majority_voting.svg', format='svg')
 # [0.90410553 0.8951825  0.9704282 ]
 
 # not best, but close enough and with more different implementations
-# ['predictions_test_probabilities.txt', 'predictions_test_char_5_grams.txt', 'predictions_test_viterbi_v1.txt', 'predictions_test_LDA_v2.txt', 'predictions_test_SVM.txt']
+# ['predictions_test_probabilities.txt', 'predictions_test_char_5_grams.txt', 'predictions_test_viterbi_v1.txt', 'predictions_test_LDA.txt', 'predictions_test_SVM.txt']
 # 0.9067809582121537
 # [0.89515916 0.88199527 0.9704282 ]
 

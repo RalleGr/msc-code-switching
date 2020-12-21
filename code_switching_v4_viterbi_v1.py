@@ -2,11 +2,14 @@ from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from models.viterbi.viterbi_identifier import ViterbiIdentifier
 from tools.utils import is_other
-from tools.utils import printStatus
+from tools.utils import print_status
 from tools.utils import save_predictions
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
+
+# Based on eginhard’s implementation (Source: https://github.com/eginhard/word-level-language-id)
+# This version was used as final model
 
 WORD_DICTIONARIES_PATH = "./dictionaries/word-level/"
 VITERBI_DICTIONARIES_PATH = "./dictionaries/viterbi/"
@@ -29,7 +32,7 @@ identifier = ViterbiIdentifier(en, es,
 								en_lex, es_lex)
 
 # Get data
-printStatus("Getting test data...")
+print_status("Getting test data...")
 # filepath = './datasets/bilingual-annotated/dev.conll' # validation
 filepath = './datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
@@ -85,9 +88,6 @@ y = [item for y_sent in y for item in y_sent]
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
-# 0.9447299794921133 # with 2grams - best
-# 0.9437678811048941 # with 3grams
-# 0.9401220345849052 # with 4grams - stop here
 
 # Fq score
 f1 = f1_score(t, y, average=None)

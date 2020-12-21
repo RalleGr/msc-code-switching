@@ -5,13 +5,13 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from tools.utils import is_other
 from tools.utils import save_predictions
-from tools.utils import printStatus
+from tools.utils import print_status
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.linear_model import LogisticRegression
 import pandas as pd
 
 # Get training dictionaries
-printStatus("Getting tokenized sentences...")
+print_status("Getting tokenized sentences...")
 tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_en.p')
 tokenized_sentences_es = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_es.p')
 
@@ -25,18 +25,18 @@ t_train_es = ['lang2' for token in tokenized_sentences_es]
 t_train = t_train_en + t_train_es
 
 # Convert a collection of text documents to a matrix of token counts
-printStatus("Counting ngrams...")
+print_status("Counting ngrams...")
 # vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
 vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
 vectorized_data = vectorizer.fit_transform(X_train)
 
 # Create and fit the SVM model
-printStatus("Training Logistic Regression...")
+print_status("Training Logistic Regression...")
 logist_regression = LogisticRegression(max_iter=1000, random_state=123)
 logist_regression.fit(vectorized_data, t_train)
 
 # Get test data
-printStatus("Getting test data...")
+print_status("Getting test data...")
 # filepath = 'datasets/bilingual-annotated/dev.conll' # validation
 filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
@@ -55,7 +55,7 @@ for line in file:
 file.close()
 
 # Create the array of predicted classes
-printStatus("Predicting...")
+print_status("Predicting...")
 y = []
 predictions_dict = dict()
 for word in words:
@@ -116,4 +116,4 @@ save_predictions(predictions_dict, './results/predictions/predictions_test_Logis
 # 0.9110924026736058
 # [0.90466873 0.88314996 0.9704282 ]
 
-# NOTE!!! predictions.txt are saved for TfidfVectorizer(binary=True) model
+# NOTE! predictions.txt are saved for TfidfVectorizer(binary=True) model

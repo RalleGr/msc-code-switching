@@ -4,14 +4,12 @@ from spacy.lang.es import Spanish
 import os
 from tools.utils import write_dict
 from tools.utils import is_other
-from tools.utils import merge_dictionaries
 import pandas as pd
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
 def get_frequency_dict(lang):
 	frequency_dict = dict()
-	other_dict = dict()
 
 	# Load data
 	for root, dirs, files in os.walk('datasets/monolingual-' + lang):
@@ -35,17 +33,14 @@ def get_frequency_dict(lang):
 				word = word.text.lower()
 
 				if is_other(word):
-					if word in other_dict.keys():
-						other_dict[word] += 1
-					else:
-						other_dict[word] = 1
+					continue
 				else:
 					if word in frequency_dict.keys():
 						frequency_dict[word] += 1
 					else:
 						frequency_dict[word] = 1
 
-	return frequency_dict, other_dict
+	return frequency_dict
 
 def get_probability_dict(frequency_dict):
 	smoothing_factor = 1
@@ -58,8 +53,8 @@ def get_probability_dict(frequency_dict):
 
 # EN
 
-# Uncomment this to get frequency dict from monolingual datasets
-frequency_en_dict, other_dict_en = get_frequency_dict('en')
+# Uncomment this to create a frequency dict from monolingual datasets
+frequency_en_dict = get_frequency_dict('en')
 
 # Uncomment this to get existing frequency dict
 # frequency_en_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_en.csv', encoding='utf-16')
@@ -71,7 +66,7 @@ write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_en_dict, 'frequency_dict_en',
 
 # ES
 # Uncomment this to get frequency dict from monolingual datasets
-frequency_es_dict, other_dict_es = get_frequency_dict('es')
+frequency_es_dict = get_frequency_dict('es')
 
 # Uncomment this to get existing frequency dict
 # frequency_es_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_es.csv', encoding='utf-16')
@@ -81,8 +76,4 @@ frequency_es_dict, other_dict_es = get_frequency_dict('es')
 probability_dict_es = get_probability_dict(frequency_es_dict)
 write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_es_dict, 'frequency_dict_es', probability_dict_es, 'probability_dict_es')
 
-# Dictionaries for other class
-# other_dict = merge_dictionaries(other_dict_en, other_dict_es)
-# probability_dict_other = get_probability_dict(other_dict)
-# write_dict(WORD_LEVEL_DICTIONARIES_PATH, other_dict, 'frequency_dict_other')
 

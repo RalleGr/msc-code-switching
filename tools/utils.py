@@ -52,7 +52,7 @@ def merge_dictionaries(dict1, dict2):
 	dict2.update(dict1)
 	return dict2
 
-def printStatus(status):
+def print_status(status):
 	now = datetime.now()
 	current_time = now.strftime("%H:%M:%S")
 	print(f"[{current_time}] {status}")
@@ -61,4 +61,4 @@ def save_predictions(predictions, file_name):
 	"""Saves the language model to the specified file in JSON format"""
 	with open(file_name, "w") as f:
 		json.dump(predictions, f)
-	printStatus('Predictions saved at: ' + file_name)
+	print_status('Predictions saved at: ' + file_name)

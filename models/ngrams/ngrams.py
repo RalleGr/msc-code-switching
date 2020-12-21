@@ -3,7 +3,7 @@ from nltk.util import everygrams
 from nltk import FreqDist
 import numpy as np
 from numpy.lib import utils
-from tools.utils import printStatus
+from tools.utils import print_status
 
 class NGramModel:
 	def __init__(self, n):
@@ -29,7 +29,7 @@ class NGramModel:
 		fourgrams = []
 		fivegrams = []
 		sixgrams = []
-		printStatus("Creating n-grams...")
+		print_status("Creating n-grams...")
 		j = 0
 		for token in self.tokens_dict.keys():
 			if type(token) is float:

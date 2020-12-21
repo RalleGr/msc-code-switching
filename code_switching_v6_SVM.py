@@ -5,14 +5,14 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from tools.utils import is_other
 from tools.utils import save_predictions
-from tools.utils import printStatus
+from tools.utils import print_status
 from sklearn.feature_extraction.text import CountVectorizer, TfidfVectorizer
 from sklearn.svm import SVC
 from sklearn.svm import LinearSVC
 import pandas as pd
 
 # Get training dictionaries
-printStatus("Getting tokenized sentences...")
+print_status("Getting tokenized sentences...")
 tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_en.p')
 tokenized_sentences_es = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_es.p')
 
@@ -26,19 +26,19 @@ t_train_es = ['lang2' for token in tokenized_sentences_es]
 t_train = t_train_en + t_train_es
 
 # Convert a collection of text documents to a matrix of token counts
-printStatus("Counting ngrams...")
+print_status("Counting ngrams...")
 # vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
 vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
 vectorized_data = vectorizer.fit_transform(X_train)
 
 # Create and fit the SVM model
-printStatus("Training SVM...")
+print_status("Training SVM...")
 # svm = LinearSVC()
 svm = SVC(random_state=123)
 svm.fit(vectorized_data, t_train)
 
 # Get test data
-printStatus("Getting test data...")
+print_status("Getting test data...")
 # filepath = 'datasets/bilingual-annotated/dev.conll' # validation
 filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
@@ -57,7 +57,7 @@ for line in file:
 file.close()
 
 # Create the array of y classes
-printStatus("Predicting...")
+print_status("Predicting...")
 y = []
 predictions_dict = dict()
 for word in words:
@@ -72,13 +72,10 @@ for word in words:
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
-# 0.8240580297237765 # at 1,000 words per lang
-# 0.8883965870825632 # at 100,000 words per lang - stop here (55 min in total)
 
 # Fq score
 f1 = f1_score(t, y, average=None)
 print(f1)
-#[0.89405399 0.85519743 0.93879938]
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)

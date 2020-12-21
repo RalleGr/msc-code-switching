@@ -8,7 +8,7 @@ from sklearn.metrics import confusion_matrix
 from models.ngrams.ngrams import NGramModel
 from tools.utils import save_predictions
 from tools.utils import is_other
-from tools.utils import printStatus
+from tools.utils import print_status
 import sys
 
 CHAR_LEVEL_DICTIONARIES_PATH = "./dictionaries/character-level/"
@@ -19,7 +19,7 @@ if n!=2 and n!=3 and n!=4 and n!=5 and n!=6:
 	exit(1)
 
 # Get dictionaries
-printStatus("Getting dictionaries...")
+print_status("Getting dictionaries...")
 frequency_en_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_dict_en.csv', encoding='utf-16', converters={"word": ast.literal_eval})
 frequency_en_dict = frequency_en_df.set_index('word')['frequency'].to_dict()
 
@@ -27,7 +27,7 @@ frequency_es_df = pd.read_csv(CHAR_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_di
 frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
 
 # Apply ngram model to en, es and other
-printStatus("Applying NGRAM model...")
+print_status("Applying NGRAM model...")
 model_en = NGramModel(n)
 model_en.load_ngrams_freq(frequency_en_dict)
 
@@ -35,7 +35,7 @@ model_es = NGramModel(n)
 model_es.load_ngrams_freq(frequency_es_dict)
 
 # Get data
-printStatus("Getting test data...")
+print_status("Getting test data...")
 # filepath = 'datasets/bilingual-annotated/dev.conll' # validation
 filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
@@ -57,7 +57,7 @@ file.close()
 y = []
 predictions_dict = dict()
 counter = 0
-printStatus("Classifying...")
+print_status("Classifying...")
 for word in words:
 	word = word.lower()
 	if is_other(word):
@@ -80,13 +80,6 @@ for word in words:
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
-# 0.3306321355653757 # first try with unigrams and bigrams
-# 0.7512812260156966 # after fixing bug (string type vs. tuple type)
-# 0.7955034559586804 # using unigrams and bigrams
-# 0.8777628680659291 # using bigrams and trigrams
-# 0.9003721801655822 # using trigrams grams and 4 grams
-# 0.9113856748613819 # using 4 grams and 5 grams - best
-# 0.9095374332227764 # using 5 grams and 6 grams
 
 # Fq score
 f1 = f1_score(t, y, average=None)

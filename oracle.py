@@ -1,7 +1,6 @@
 import json
 import os
-from tools.utils import printStatus
-import operator
+from tools.utils import print_status
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
@@ -10,22 +9,24 @@ from sklearn.metrics import confusion_matrix
 
 PREDICTIONS_PATH = './results/predictions/'
 
+# Validation results
 predictionsFileNames = [
 	'predictions_val_probabilities.txt',
 	'predictions_val_char_5_grams.txt',
 	# 'predictions_val_word_2_grams.txt',
 	'predictions_val_viterbi_v1.txt',
-	'predictions_val_LDA_v2.txt',
+	'predictions_val_LDA.txt',
 	'predictions_val_SVM.txt',
 	# 'predictions_val_LogisticRegression.txt',
 ]
 
+# Test results
 # predictionsFileNames = [
 # 	'predictions_test_probabilities.txt',
 # 	'predictions_test_char_5_grams.txt',
 # 	# 'predictions_test_word_2_grams.txt',
 # 	'predictions_test_viterbi_v1.txt',
-# 	'predictions_test_LDA_v2.txt',
+# 	'predictions_test_LDA.txt',
 # 	'predictions_test_SVM.txt',
 # 	# 'predictions_test_LogisticRegression.txt',
 # ]
@@ -38,7 +39,7 @@ for file in predictionsFileNames:
   		results.append(json.load(file))
 
 # Get data
-printStatus("Getting test data...")
+print_status("Getting test data...")
 filepath = 'datasets/bilingual-annotated/dev.conll' # validation
 # filepath = 'datasets/bilingual-annotated/test.conll' # test
 file = open(filepath, 'rt', encoding='utf8')
