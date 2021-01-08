@@ -107,17 +107,17 @@ if(count_lang1>=count_lang2):
 	cluster_0_label = 'lang1'
 	cluster_1_label = 'lang2'
 else: 
-	cluster_1_label = 'lang2'
-	cluster_2_label = 'lang1'
+	cluster_0_label = 'lang2'
+	cluster_1_label = 'lang1'
 
 # Predict
 print_status("Predicting...")
 words_dict = dict()
 for i in range(len(dev_words_not_other)):
 	if(lda[i][0] > lda[i][1]):
-		topic = 'lang1'
+		topic = cluster_0_label
 	else: 
-		topic = 'lang2'
+		topic = cluster_1_label
 	words_dict[dev_words_not_other[i]] = topic
 
 y = []
