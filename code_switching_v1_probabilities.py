@@ -16,9 +16,6 @@ probability_en_dict = probability_en_df.set_index('word')['probability'].to_dict
 probability_es_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_es.csv', encoding='utf-16')
 probability_es_dict = probability_es_df.set_index('word')['probability'].to_dict()
 
-probability_other_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_other.csv', encoding='utf-8')
-probability_other_dict = probability_other_df.set_index('word')['probability'].to_dict()
-
 # Get data
 # filepath = 'datasets/bilingual-annotated/dev.conll' # validation
 filepath = 'datasets/bilingual-annotated/test.conll' # test
