@@ -163,12 +163,15 @@ if (evaluation_dataset == 'test-original'):
 
 # Get accuracy
 acc = accuracy_score(t, y)
-print(acc)
+print("Accuracy: " + str(acc))
 
-# Fq score
+# F1 score
 f1 = f1_score(t, y, average=None)
-print(f1)
+print("F1 score per class: " + str(f1))
 
+# F1 score weighted
+f1_weighted = f1_score(t, y, average='weighted')
+print("Weighted F1 score: " + str(f1_weighted))
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)
@@ -223,5 +226,6 @@ if (evaluation_dataset == 'test'):
 ##################### RESULTS FOR WORKSHOP ################################
 # Dev set
 # TfidfVectorizer(binary=True) - 100 000 words per lang
-# 0.6453148340380283
-# [0.59368086 0.53088275 0.96758294]
+# Accuracy: 0.6453148340380283
+# F1 score per class: [0.59368086 0.53088275 0.96758294]
+# Weighted F1 score: 0.6440266471825151

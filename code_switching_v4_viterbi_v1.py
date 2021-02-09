@@ -118,11 +118,15 @@ y = [item for y_sent in y for item in y_sent]
 
 # Get accuracy
 acc = accuracy_score(t, y)
-print(acc)
+print("Accuracy: " + str(acc))
 
-# Fq score
+# F1 score
 f1 = f1_score(t, y, average=None)
-print(f1)
+print("F1 score per class: " + str(f1))
+
+# F1 score weighted
+f1_weighted = f1_score(t, y, average='weighted')
+print("Weighted F1 score: " + str(f1_weighted))
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)
@@ -144,3 +148,10 @@ if (evaluation_dataset == 'test'):
 # Test set
 # 0.9368080004081841
 # [0.92870999 0.92623526 0.9704282 ]
+
+###########################################################################
+##################### RESULTS FOR WORKSHOP ################################
+# Dev set
+# Accuracy: 0.9576423525837405
+# F1 score per class: [0.95817377 0.9517566  0.96758294]
+# Weighted F1 score: 0.9576092950577793

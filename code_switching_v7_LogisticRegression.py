@@ -95,20 +95,20 @@ for word in words:
 		y.append('')
 
 if (evaluation_dataset == 'test-original'):
-	save_predictions(y, './results/predictions/predictions_test_original_SVM.txt')
+	save_predictions(y, './results/predictions/predictions_test_original_LogisticRegression.txt')
 	exit(1)
 
 # Get accuracy
 acc = accuracy_score(t, y)
-print(acc)
-# 0.8123908144922399 # at 1,000 words per lang
-# 0.8961440109375396 # at 100,000 words per lang
-# 0.9040939818214041 # at 200,000 words per lang
-# 0.9079676937488923 # at 500,000 words per lang - stop here (5 min in total)
+print("Accuracy: " + str(acc))
 
-# Fq score
+# F1 score
 f1 = f1_score(t, y, average=None)
-print(f1)
+print("F1 score per class: " + str(f1))
+
+# F1 score weighted
+f1_weighted = f1_score(t, y, average='weighted')
+print("Weighted F1 score: " + str(f1_weighted))
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)
@@ -125,6 +125,10 @@ if (evaluation_dataset == 'test'):
 
 # RESULTS
 # Validation set
+# 0.8123908144922399 # at 1,000 words per lang
+# 0.8961440109375396 # at 100,000 words per lang
+# 0.9040939818214041 # at 200,000 words per lang
+# 0.9079676937488923 # at 500,000 words per lang - stop here (5 min in total)
 
 # 	CountVectorizer(binary=False)
 # 0.9200951971035775
@@ -153,10 +157,6 @@ if (evaluation_dataset == 'test'):
 ##################### RESULTS FOR WORKSHOP ################################
 # Dev set
 # TfidfVectorizer(binary=True) - 100 000 words per lang
-# 0.9037395245208497
-# [0.89650742 0.87737252 0.96758294]
-
-# Test set
-# TfidfVectorizer(binary=True) - 100 000 words per lang
-# 0.8940507168733098
-# [0.87870749 0.86625389 0.9704282 ]
+# Accuracy: 0.9037395245208497
+# F1 score per class: [0.89650742 0.87737252 0.96758294]
+# Weighted F1 score: 0.9033524655078986

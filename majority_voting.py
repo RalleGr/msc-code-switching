@@ -9,51 +9,86 @@ from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 import itertools
+import sys
 
 PREDICTIONS_PATH = './results/predictions/'
 
-# Validation results
-# predictionsFileNames = [
-# 	'predictions_val_probabilities.txt',
-# 	'predictions_val_char_5_grams.txt',
-# 	# 'predictions_val_word_2_grams.txt',
-# 	'predictions_val_viterbi_v1.txt',
-# 	'predictions_val_LDA.txt',
-# 	# 'predictions_val_SVM.txt',
-# 	'predictions_val_LogisticRegression.txt',
-# ]
+# Get evaluation dataset from keyboard
+if len(sys.argv) == 1:
+	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
+	exit(1)
+evaluation_dataset = sys.argv[1]
 
-# Test results
-predictionsFileNames = [
-	'predictions_test_probabilities.txt',
-	'predictions_test_char_5_grams.txt',
-	# 'predictions_test_word_2_grams.txt',
-	'predictions_test_viterbi_v1.txt',
-	'predictions_test_LDA.txt',
-	'predictions_test_SVM.txt',
-	# 'predictions_test_LogisticRegression.txt',
-]
+# Get test data
+print_status("Getting test data...")
+if (evaluation_dataset == 'dev'):
+	predictionsFileNames = [
+		'predictions_val_probabilities.txt',
+		'predictions_val_char_5_grams.txt',
+		'predictions_val_word_2_grams.txt',
+		'predictions_val_viterbi_v1.txt',
+		'predictions_val_LDA.txt',
+		'predictions_val_SVM.txt',
+		'predictions_val_LogisticRegression.txt',
+	]
+if (evaluation_dataset == 'test'):
+	predictionsFileNames = [
+		'predictions_test_probabilities.txt',
+		'predictions_test_char_5_grams.txt',
+		'predictions_test_word_2_grams.txt',
+		'predictions_test_viterbi_v1.txt',
+		'predictions_test_LDA.txt',
+		'predictions_test_SVM.txt',
+		'predictions_test_LogisticRegression.txt',
+	]
+if (evaluation_dataset == 'test-original'):
+	predictionsFileNames = [
+		'predictions_test_original_probabilities.txt',
+		'predictions_test_original_char_5_grams.txt',
+		'predictions_test_original_word_2_grams.txt',
+		'predictions_test_original_viterbi_v1.txt',
+		'predictions_test_original_LDA.txt',
+		'predictions_test_original_SVM.txt',
+		'predictions_test_original_LogisticRegression.txt',
+	]
 
 # perms = list(itertools.permutations(predictionsFileNames, r=5))
 perms = [predictionsFileNames]
 
-# Get data
+# Get test data
 print_status("Getting test data...")
-# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-filepath = 'datasets/bilingual-annotated/test.conll' # test
+if (evaluation_dataset == 'dev'):
+	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+if (evaluation_dataset == 'test'):
+	filepath = './datasets/bilingual-annotated/test.conll' # test
+if (evaluation_dataset == 'test-original'):
+	filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+
 file = open(filepath, 'rt', encoding='utf8')
 words = []
 t = []
-for line in file:
-	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
-	if (line.strip() is not '' and '# sent_enum' not in line):
-		line = line.rstrip('\n')
-		splits = line.split("\t")
-		if (splits[1] == 'ambiguous' or splits[1] == 'fw' or splits[1] == 'mixed' or splits[1] == 'ne' or splits[1] == 'unk'):
-			continue
+
+if (evaluation_dataset != 'test-original'):
+	# Own dev/test set
+	for line in file:
+		# Remove empty lines, lines starting with # sent_enum, \n and split on tab
+		if (line.strip() is not '' and '# sent_enum' not in line):
+			line = line.rstrip('\n')
+			splits = line.split("\t")
+			if (splits[1] == 'ambiguous' or splits[1] == 'fw' or splits[1] == 'mixed' or splits[1] == 'ne' or splits[1] == 'unk'):
+				continue
+			else:
+				words.append(splits[0].lower())
+				t.append(splits[1])
+else:
+	# Original test set
+	for line in file:
+		# Remove empty lines, lines starting with # sent_enum, \n and split on tab
+		if (line.strip() is not ''):
+			token = line.rstrip('\n')
+			words.append(token.lower())
 		else:
-			words.append(splits[0].lower())
-			t.append(splits[1])
+			words.append('')
 file.close()
 
 best_acc = 0

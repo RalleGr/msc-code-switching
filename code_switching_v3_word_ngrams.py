@@ -117,11 +117,15 @@ if (evaluation_dataset == 'test-original'):
 
 # Get accuracy
 acc = accuracy_score(t, y)
-print(acc)
+print("Accuracy: " + str(acc))
 
-# Fq score
+# F1 score
 f1 = f1_score(t, y, average=None)
-print(f1)
+print("F1 score per class: " + str(f1))
+
+# F1 score weighted
+f1_weighted = f1_score(t, y, average='weighted')
+print("Weighted F1 score: " + str(f1_weighted))
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)
@@ -153,3 +157,11 @@ if (evaluation_dataset == 'test'):
 # trigrams
 # 0.4430583193020052
 # [0.45181117 0.01789812 0.9704282 ]
+
+###########################################################################
+##################### RESULTS FOR WORKSHOP ################################
+# Dev set
+# bigrams
+# Accuracy: 0.5092285490037218
+# F1 score per class: [0.45413354 0.31975212 0.96758294]
+# Weighted F1 score: 0.505039548429604

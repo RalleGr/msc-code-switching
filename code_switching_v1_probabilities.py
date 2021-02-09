@@ -97,11 +97,15 @@ if (evaluation_dataset == 'test-original'):
 
 # Get accuracy
 acc = accuracy_score(t, y)
-print(acc)
+print("Accuracy: " + str(acc))
 
-# Fq score
+# F1 score
 f1 = f1_score(t, y, average=None)
-print(f1)
+print("F1 score per class: " + str(f1))
+
+# F1 score weighted
+f1_weighted = f1_score(t, y, average='weighted')
+print("Weighted F1 score: " + str(f1_weighted))
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, y)
@@ -115,11 +119,14 @@ if (evaluation_dataset == 'dev'):
 if (evaluation_dataset == 'test'):
 	save_predictions(predictions_dict, './results/predictions/predictions_test_probabilities.txt')
 
-# RESULTS
-# Validation (dev) set
-# 0.9138921943438743
-# [0.91054322 0.88774562 0.96758294]
+# Own test set
+# Accuracy: 0.8930302566457472
+# F1 score per class: [0.88149196 0.85917539 0.9704282 ]
+# Weighted F1 score: 0.8927354350501349
 
-# Test set
-# 0.8930302566457472
-# [0.88149196 0.85917539 0.9704282 ]
+###########################################################################
+##################### RESULTS FOR WORKSHOP ################################
+# Validation (dev) set
+# Accuracy: 0.9138921943438743
+# F1 score per class: [0.91054322 0.88774562 0.96758294]
+# Weighted F1 score: 0.9132189414118914
