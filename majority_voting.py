@@ -2,6 +2,7 @@ import json
 import os
 from tools.utils import print_status
 from tools.utils import is_other
+from tools.utils import save_predictions
 import operator
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
@@ -20,16 +21,16 @@ if len(sys.argv) == 1:
 evaluation_dataset = sys.argv[1]
 
 # Get test data
-print_status("Getting test data...")
+print_status("Getting predictions data...")
 if (evaluation_dataset == 'dev'):
 	predictionsFileNames = [
 		'predictions_val_probabilities.txt',
 		'predictions_val_char_5_grams.txt',
-		'predictions_val_word_2_grams.txt',
+		# 'predictions_val_word_2_grams.txt',
 		'predictions_val_viterbi_v1.txt',
 		'predictions_val_LDA.txt',
 		'predictions_val_SVM.txt',
-		'predictions_val_LogisticRegression.txt',
+		# 'predictions_val_LogisticRegression.txt',
 	]
 if (evaluation_dataset == 'test'):
 	predictionsFileNames = [
@@ -83,12 +84,8 @@ if (evaluation_dataset != 'test-original'):
 else:
 	# Original test set
 	for line in file:
-		# Remove empty lines, lines starting with # sent_enum, \n and split on tab
-		if (line.strip() is not ''):
-			token = line.rstrip('\n')
-			words.append(token.lower())
-		else:
-			words.append('')
+		token = line.rstrip('\n')
+		words.append(token.lower())
 file.close()
 
 best_acc = 0
@@ -97,44 +94,87 @@ best_ensembly = None
 for perm in perms:
 	# Read all results
 	results = []
-	for file in perm:
-		file_path = os.path.join(PREDICTIONS_PATH, file)
-		with open(file_path, 'r') as file:
-			results.append(json.load(file))
 
-	nr_words = len(words)
-	nr_predictions = len(results)
+	if (evaluation_dataset != 'test-original'):
+		for file in perm:
+			file_path = os.path.join(PREDICTIONS_PATH, file)
+			with open(file_path, 'r') as file:
+				results.append(json.load(file))
 
-	# Create a list of dict elements: {'lang1': nr_of_predictions, 'lang2': nr_of_predictions, 'other': nr_of_predictions}
-	results_dict = []
-	labels = ['lang1', 'lang2', 'other'] 
-	for i in range(nr_words):
-		results_dict.append({key: 0 for key in labels})
+		nr_words = len(words)
+		nr_predictions = len(results)
 
-	for i in range(nr_words):
-		for j in range(nr_predictions):
-			word = words[i]
-			predicted_label = results[j][word]
-			results_dict[i][predicted_label] += 1
+		# Create a list of dict elements: {'lang1': nr_of_predictions, 'lang2': nr_of_predictions, 'other': nr_of_predictions}
+		results_dict = []
+		labels = ['lang1', 'lang2', 'other'] 
+		for i in range(nr_words):
+			results_dict.append({key: 0 for key in labels})
 
-	predictions = []
-	for word in results_dict:
-		predictions.append(max(word.items(), key=operator.itemgetter(1))[0])
+		for i in range(nr_words):
+			for j in range(nr_predictions):
+				word = words[i]
+				predicted_label = results[j][word]
+				results_dict[i][predicted_label] += 1
 
-	# Get accuracy
-	acc = accuracy_score(t, predictions)
-	# print(acc)
-	if (acc > best_acc):
-		best_acc = acc
-		best_predictions = predictions
+		predictions = []
+		for word in results_dict:
+			predictions.append(max(word.items(), key=operator.itemgetter(1))[0])
+
+		# Get accuracy
+		acc = accuracy_score(t, predictions)
+		# print(acc)
+		if (acc > best_acc):
+			best_acc = acc
+			best_predictions = predictions
+			best_ensembly = perm
+	else:
+		for file in perm:
+			result = []
+			file_path = os.path.join(PREDICTIONS_PATH, file)
+			with open(file_path, 'r') as file:
+				for line in file:
+					pred = line.rstrip('\n')
+					result.append(pred)
+			results.append(result)
+		
+		nr_words = len(words)
+		nr_predictions = len(results)
+
+		# Create a list of dict elements: {'lang1': nr_of_predictions, 'lang2': nr_of_predictions, 'other': nr_of_predictions}
+		results_dict = []
+		labels = ['lang1', 'lang2', 'other'] 
+		for i in range(nr_words):
+			results_dict.append({key: 0 for key in labels})
+
+		predictions = []
+		for i in range(nr_words):
+			if (words[i] != ''):
+				for j in range(nr_predictions):
+					predicted_label = results[j][i]
+					results_dict[i][predicted_label] += 1
+				predictions.append(max(results_dict[i].items(), key=operator.itemgetter(1))[0])
+			else:
+				predictions.append('')
+		
 		best_ensembly = perm
+		best_predictions = predictions
 
 print(best_ensembly)
-print(best_acc)
 
-# Fq score
+if (evaluation_dataset == 'test-original'):
+	save_predictions(best_predictions, './results/predictions/predictions_test_original_ensemble_all.txt')
+	exit(1)
+
+# Get accuracy
+print("Accuracy: " + str(best_acc))
+
+# F1 score
 f1 = f1_score(t, best_predictions, average=None)
-print(f1)
+print("F1 score per class: " + str(f1))
+
+# F1 score weighted
+f1_weighted = f1_score(t, best_predictions, average='weighted')
+print("Weighted F1 score: " + str(f1_weighted))
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, best_predictions)
@@ -187,3 +227,25 @@ plt.savefig('./results/CM/confusion_matrix_majority_voting.svg', format='svg')
 # 0.9067809582121537
 # [0.89515916 0.88199527 0.9704282 ]
 
+
+###########################################################################
+##################### RESULTS FOR WORKSHOP ################################
+# Dev set
+
+# All models
+# ['predictions_val_probabilities.txt', 'predictions_val_char_5_grams.txt', 'predictions_val_word_2_grams.txt', 'predictions_val_viterbi_v1.txt', 'predictions_val_LDA.txt', 'predictions_val_SVM.txt', 'predictions_val_LogisticRegression.txt']
+# Accuracy: 0.9220447122566271
+# F1 score per class: [0.91916767 0.90004613 0.96758294]
+# Weighted F1 score: 0.9215255409360907
+
+# Models 2, 4 and 6
+# ['predictions_val_char_5_grams.txt', 'predictions_val_viterbi_v1.txt', 'predictions_val_SVM.txt']
+# Accuracy: 0.9373876496949135
+# F1 score per class: [0.93546508 0.9231036  0.96758294]
+# Weighted F1 score: 0.937151714285826
+
+# Models 1, 2, 4, 5 and 6
+# ['predictions_val_probabilities.txt', 'predictions_val_char_5_grams.txt', 'predictions_val_viterbi_v1.txt', 'predictions_val_LDA.txt', 'predictions_val_SVM.txt']
+# Accuracy: 0.9300200015191027
+# F1 score per class: [0.9278748  0.91172122 0.96758294]
+# Weighted F1 score: 0.9296303238372436
