@@ -1,50 +1,71 @@
 import json
 import os
 from tools.utils import print_status
+from tools.utils import save_predictions
 import matplotlib.pyplot as plt
 from sklearn.metrics import accuracy_score
 from sklearn.metrics import f1_score
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
+import sys
 
 PREDICTIONS_PATH = './results/predictions/'
 
-# Validation results
-predictionsFileNames = [
-	'predictions_val_probabilities.txt',
-	'predictions_val_char_5_grams.txt',
-	# 'predictions_val_word_2_grams.txt',
-	'predictions_val_viterbi_v1.txt',
-	'predictions_val_LDA.txt',
-	'predictions_val_SVM.txt',
-	# 'predictions_val_LogisticRegression.txt',
-]
+# Get evaluation dataset from keyboard
+if len(sys.argv) == 1:
+	print("Please enter evaluation dataset: 'dev' or 'test'")
+	exit(1)
+evaluation_dataset = sys.argv[1]
 
-# Test results
-# predictionsFileNames = [
-# 	'predictions_test_probabilities.txt',
-# 	'predictions_test_char_5_grams.txt',
-# 	# 'predictions_test_word_2_grams.txt',
-# 	'predictions_test_viterbi_v1.txt',
-# 	'predictions_test_LDA.txt',
-# 	'predictions_test_SVM.txt',
-# 	# 'predictions_test_LogisticRegression.txt',
-# ]
+# Get predictions data
+print_status("Getting predictions data...")
+if (evaluation_dataset == 'dev'):
+	predictionsFileNames = [
+		'predictions_val_probabilities.txt',
+		'predictions_val_char_5_grams.txt',
+		'predictions_val_word_2_grams.txt',
+		'predictions_val_viterbi_v1.txt',
+		'predictions_val_LDA.txt',
+		'predictions_val_SVM.txt',
+		'predictions_val_LogisticRegression.txt',
+	]
+if (evaluation_dataset == 'test'):
+	predictionsFileNames = [
+		'predictions_test_probabilities.txt',
+		'predictions_test_char_5_grams.txt',
+		'predictions_test_word_2_grams.txt',
+		'predictions_test_viterbi_v1.txt',
+		'predictions_test_LDA.txt',
+		'predictions_test_SVM.txt',
+		'predictions_test_LogisticRegression.txt',
+	]
 
 # Read all results
 results = []
 for file in predictionsFileNames:
 	file_path = os.path.join(PREDICTIONS_PATH, file)
 	with open(file_path, 'r') as file:
-  		results.append(json.load(file))
+		if (evaluation_dataset != 'test-original'):
+			results.append(json.load(file))
+		else:
+			result = []
+			for line in file:
+				pred = line.rstrip('\n')
+				result.append(pred)
+			results.append(result)
 
-# Get data
+# Get test data
 print_status("Getting test data...")
-filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-# filepath = 'datasets/bilingual-annotated/test.conll' # test
+if (evaluation_dataset == 'dev'):
+	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+if (evaluation_dataset == 'test'):
+	filepath = './datasets/bilingual-annotated/test.conll' # test
+
 file = open(filepath, 'rt', encoding='utf8')
 words = []
 t = []
+
+# Own dev/test set
 for line in file:
 	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
 	if (line.strip() is not '' and '# sent_enum' not in line):
@@ -72,11 +93,15 @@ for i in range(nr_words):
 
 # Get accuracy
 acc = accuracy_score(t, predictions)
-print(acc)
+print("Accuracy: " + str(acc))
 
-# Fq score
+# F1 score
 f1 = f1_score(t, predictions, average=None)
-print(f1)
+print("F1 score per class: " + str(f1))
+
+# F1 score weighted
+f1_weighted = f1_score(t, predictions, average='weighted')
+print("Weighted F1 score: " + str(f1_weighted))
 
 # Confusion matrix
 conf_matrix = confusion_matrix(t, predictions)
@@ -115,3 +140,10 @@ plt.savefig('./results/CM/confusion_matrix_oracle.svg', format='svg')
 # 0.9815041583754274
 # [0.98084909 0.98897098 0.9704282 ]
 
+###########################################################################
+##################### RESULTS FOR WORKSHOP ################################
+# Dev set
+# All outcomes
+# Accuracy: 0.9846317441831025
+# F1 score per class: [0.98958178 0.98813616 0.96758294]
+# Weighted F1 score: 0.9846733025451053
