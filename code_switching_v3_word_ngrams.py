@@ -13,10 +13,18 @@ import sys
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
-n = int(sys.argv[1])
-if n!=2 and n!=3 and n!=4 and n!=5 and n!=6:
-	print("n should be 2, 3, 4, 5 or 6")
+# Get n value and evaluation dataset from keyboard
+if len(sys.argv) == 1:
+	print("Please enter n value for n-grams")
+	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
 	exit(1)
+
+n = int(sys.argv[1])
+if n!=2 and n!=3:
+	print("n should be 2 or 3")
+	exit(1)
+
+evaluation_dataset = sys.argv[2]
 
 # Get dictionaries
 print_status("Getting dictionaries...")
@@ -36,27 +44,44 @@ model_es.load_ngrams_freq(frequency_es_dict)
 
 # Get data
 print_status("Getting test data...")
-# filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-filepath = 'datasets/bilingual-annotated/test.conll' # test
+if (evaluation_dataset == 'dev'):
+	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+if (evaluation_dataset == 'test'):
+	filepath = './datasets/bilingual-annotated/test.conll' # test
+if (evaluation_dataset == 'test-original'):
+	filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
 t = []
 s = []
-for line in file:
-	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
-	if (len(line.strip()) != 0):
-		if ('# sent_enum' in line):
+if (evaluation_dataset != 'test-original'):
+	# Own dev/test set
+	for line in file:
+		# Remove empty lines, lines starting with # sent_enum, \n and split on tab
+		if (len(line.strip()) != 0):
+			if ('# sent_enum' in line):
+				sentences.append(s)
+				s = []
+			else:
+				line = line.rstrip('\n')
+				splits = line.split("\t")
+				if (splits[1]=='ambiguous' or splits[1]=='fw' or splits[1]=='mixed' or splits[1]=='ne' or splits[1]=='unk'):
+					continue
+				else:
+					s.append(splits[0].lower())
+					t.append(splits[1])
+	sentences.append(s) # append last sentence
+else:
+	# Original test set
+	for line in file:
+		# Remove empty lines, lines starting with # sent_enum, \n and split on tab
+		if (line.strip() is not ''):
+			token = line.rstrip('\n')
+			s.append(token.lower())
+		else:
 			sentences.append(s)
 			s = []
-		else:
-			line = line.rstrip('\n')
-			splits = line.split("\t")
-			if (splits[1]=='ambiguous' or splits[1]=='fw' or splits[1]=='mixed' or splits[1]=='ne' or splits[1]=='unk'):
-				continue
-			else:
-				s.append(splits[0].lower())
-				t.append(splits[1])
-sentences.append(s) # append last sentence
 file.close()
 
 # Choose language with highest probability for each word based on ngrams
@@ -83,6 +108,13 @@ for s in sentences:
 		print(f"{counter} of {len(sentences)}")
 	counter+=1
 
+	if (evaluation_dataset == 'test-original'):
+		y.append('')
+
+if (evaluation_dataset == 'test-original'):
+	save_predictions(y, './results/predictions/predictions_test_original_word_' + str(n) + '_grams.txt')
+	exit(1)
+
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
@@ -98,8 +130,10 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plo
 plt.savefig('./results/CM/confusion_matrix_' + str(n) + '_grams_words.svg',format='svg')
 
 # Save model output
-# save_predictions(predictions_dict, './results/predictions/predictions_val_word_' + str(n) + '_grams.txt')
-save_predictions(predictions_dict, './results/predictions/predictions_test_word_' + str(n) + '_grams.txt')
+if (evaluation_dataset == 'dev'):
+	save_predictions(predictions_dict, './results/predictions/predictions_val_word_' + str(n) + '_grams.txt')
+if (evaluation_dataset == 'test'):
+	save_predictions(predictions_dict, './results/predictions/predictions_test_word_' + str(n) + '_grams.txt')
 
 # RESULTS
 # Validation set

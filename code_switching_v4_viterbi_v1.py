@@ -7,12 +7,19 @@ from tools.utils import save_predictions
 from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
+import sys
 
 # Based on eginhard’s implementation (Source: https://github.com/eginhard/word-level-language-id)
 # This version was used as final model
 
 WORD_DICTIONARIES_PATH = "./dictionaries/word-level/"
 VITERBI_DICTIONARIES_PATH = "./dictionaries/viterbi/"
+
+# Get evaluation dataset from keyboard
+if len(sys.argv) == 1:
+	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
+	exit(1)
+evaluation_dataset = sys.argv[1]
 
 # Language codes
 en = 'en'
@@ -33,41 +40,45 @@ identifier = ViterbiIdentifier(en, es,
 
 # Get data
 print_status("Getting test data...")
-# filepath = './datasets/bilingual-annotated/dev.conll' # validation
-filepath = './datasets/bilingual-annotated/test.conll' # test
-# filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+if (evaluation_dataset == 'dev'):
+	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+if (evaluation_dataset == 'test'):
+	filepath = './datasets/bilingual-annotated/test.conll' # test
+if (evaluation_dataset == 'test-original'):
+	filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
 t = []
 s = []
-# Own test set
-for line in file:
-	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
-	if (line.strip() is not ''):
-		if ('# sent_enum' in line):
-			s = []
-		else:
-			line = line.rstrip('\n')
-			splits = line.split("\t")
-			if (splits[1]=='ambiguous' or splits[1]=='fw' or splits[1]=='mixed' or splits[1]=='ne' or splits[1]=='unk'):
-				continue
-			else:
-				s.append(splits[0].lower())
-				t.append(splits[1])
-	else:
-		sentences.append(s)
 
-"""
-# Original test set
-for line in file:
-	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
-	if (line.strip() is not ''):
-		token = line.rstrip('\n')
-		s.append(token.lower())
-	else:
-		sentences.append(s)
-		s = []
-"""
+if (evaluation_dataset != 'test-original'):
+	# Own dev/test set
+	for line in file:
+		# Remove empty lines, lines starting with # sent_enum, \n and split on tab
+		if (line.strip() is not ''):
+			if ('# sent_enum' in line):
+				s = []
+			else:
+				line = line.rstrip('\n')
+				splits = line.split("\t")
+				if (splits[1]=='ambiguous' or splits[1]=='fw' or splits[1]=='mixed' or splits[1]=='ne' or splits[1]=='unk'):
+					continue
+				else:
+					s.append(splits[0].lower())
+					t.append(splits[1])
+		else:
+			sentences.append(s)
+else:
+	# Original test set
+	for line in file:
+		# Remove empty lines, lines starting with # sent_enum, \n and split on tab
+		if (line.strip() is not ''):
+			token = line.rstrip('\n')
+			s.append(token.lower())
+		else:
+			sentences.append(s)
+			s = []
 
 file.close()
 
@@ -97,7 +108,9 @@ for tokens in sentences:
 			predictions_dict[tokens[i]] = y_sentence[i]
 		y.append(y_sentence)
 
-save_predictions(y, './results/predictions/predictions_test_original_viterbi_v1.txt')
+if (evaluation_dataset == 'test-original'):
+	save_predictions(y, './results/predictions/predictions_test_original_viterbi_v1.txt')
+	exit(1)
 
 # Own test set with labels
 # Flatten y list
@@ -118,8 +131,10 @@ ConfusionMatrixDisplay(confusion_matrix=conf_matrix, display_labels=classes).plo
 plt.savefig('./results/CM/confusion_matrix_' + 'viterbi_v1.svg', format='svg')
 
 # Save model output
-# save_predictions(predictions_dict, './results/predictions/predictions_val_viterbi_v1.txt')
-save_predictions(predictions_dict, './results/predictions/predictions_test_viterbi_v1.txt')
+if (evaluation_dataset == 'dev'):
+	save_predictions(predictions_dict, './results/predictions/predictions_val_viterbi_v1.txt')
+if (evaluation_dataset == 'test'):
+	save_predictions(predictions_dict, './results/predictions/predictions_test_viterbi_v1.txt')
 
 # RESULTS
 # Validation set

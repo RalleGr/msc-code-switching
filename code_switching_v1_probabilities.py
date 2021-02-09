@@ -6,17 +6,19 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 from tools.utils import save_predictions
 from tools.utils import is_other
+from tools.utils import print_status
 import sys
 
 DICTIONARIES_PATH = "./dictionaries/word-level/"
 
-# Get language codes from keyboard
+# Get evaluation dataset from keyboard
 if len(sys.argv) == 1:
 	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
 	exit(1)
 evaluation_dataset = sys.argv[1]
 
 # Get dictionaries
+print_status("Getting dictionaries...")
 probability_en_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_en.csv', encoding='utf-16')
 probability_en_dict = probability_en_df.set_index('word')['probability'].to_dict()
 
@@ -24,6 +26,7 @@ probability_es_df = pd.read_csv(DICTIONARIES_PATH+'probability_dict_es.csv', enc
 probability_es_dict = probability_es_df.set_index('word')['probability'].to_dict()
 
 # Get data
+print_status("Getting test data...")
 if (evaluation_dataset == 'dev'):
 	filepath = './datasets/bilingual-annotated/dev.conll' # validation
 if (evaluation_dataset == 'test'):

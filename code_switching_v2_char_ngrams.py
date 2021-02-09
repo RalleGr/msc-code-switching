@@ -13,7 +13,7 @@ import sys
 
 CHAR_LEVEL_DICTIONARIES_PATH = "./dictionaries/character-level/"
 
-# Get language codes from keyboard
+# Get n value and evaluation dataset from keyboard
 if len(sys.argv) == 1:
 	print("Please enter n value for n-grams")
 	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
@@ -43,6 +43,7 @@ model_es = NGramModel(n)
 model_es.load_ngrams_freq(frequency_es_dict)
 
 # Get data
+print_status("Getting test data...")
 if (evaluation_dataset == 'dev'):
 	filepath = './datasets/bilingual-annotated/dev.conll' # validation
 if (evaluation_dataset == 'test'):
