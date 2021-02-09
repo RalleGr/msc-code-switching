@@ -20,7 +20,7 @@ if len(sys.argv) == 1:
 	exit(1)
 evaluation_dataset = sys.argv[1]
 
-# Get test data
+# Get predictions data
 print_status("Getting predictions data...")
 if (evaluation_dataset == 'dev'):
 	predictionsFileNames = [
