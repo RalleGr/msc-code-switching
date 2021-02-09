@@ -29,28 +29,39 @@ tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_se
 tokenized_sentences_es = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_es.p')
 
 # Flatten lists, so we have a long array of strings (words)
-tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:20000]
-tokenized_sentences_es = [item for sent in tokenized_sentences_es for item in sent][:20000]
+tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:100000]
+tokenized_sentences_es = [item for sent in tokenized_sentences_es for item in sent][:100000]
 X_train = tokenized_sentences_en + tokenized_sentences_es
 
 # Get 'dev' data
 print_status("Getting dev data...")
 # filepath = 'datasets/bilingual-annotated/dev.conll' # validation
-filepath = 'datasets/bilingual-annotated/test.conll' # test
+# filepath = 'datasets/bilingual-annotated/test.conll' # test
+filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
 file = open(filepath, 'rt', encoding='utf8')
 dev_words = []
 t = []
+
+# # Own dev/test set
+# for line in file:
+# 	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
+# 	if (line.strip() is not '' and '# sent_enum' not in line):
+# 		line = line.rstrip('\n')
+# 		splits = line.split("\t")
+# 		if (splits[1] == 'ambiguous' or splits[1] == 'fw' or splits[1] == 'mixed' or splits[1] == 'ne' or splits[1] == 'unk'):
+# 			continue
+# 		else:
+# 			dev_words.append(splits[0].lower())
+# 			t.append(splits[1])
+
+# Original test set
 for line in file:
 	# Remove empty lines, lines starting with # sent_enum, \n and split on tab
-	if (line.strip() is not '' and '# sent_enum' not in line):
-		line = line.rstrip('\n')
-		splits = line.split("\t")
-		if (splits[1] == 'ambiguous' or splits[1] == 'fw' or splits[1] == 'mixed' or splits[1] == 'ne' or splits[1] == 'unk'):
-			continue
-		else:
-			dev_words.append(splits[0].lower())
-			t.append(splits[1])
+	if (line.strip() is not ''):
+		token = line.rstrip('\n')
+		dev_words.append(token.lower())
 file.close()
+
 
 
 # Remove 'other' words
@@ -64,7 +75,7 @@ for word in dev_words:
 # Convert a collection of words to a matrix of token counts
 print_status("Counting ngrams...")
 # vectorizer = CountVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
-vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(1, 5), binary=False)
+vectorizer = TfidfVectorizer(analyzer='char', ngram_range=(1, 5), binary=True)
 vectorized_train_data = vectorizer.fit_transform(X_train)
 vectorized_dev_data = vectorizer.transform(dev_words_not_other)
 
@@ -130,6 +141,9 @@ for word in dev_words:
 	y.append(lang)
 	predictions_dict[word] = lang
 
+save_predictions(y, './results/predictions/predictions_test_original_LDA.txt')
+exit(1)
+
 # Get accuracy
 acc = accuracy_score(t, y)
 print(acc)
@@ -187,3 +201,9 @@ save_predictions(predictions_dict, './results/predictions/predictions_test_LDA.t
 # TfidfVectorizer(binary=False)
 # 0.6481198020307158
 # [0.5947801  0.51802328 0.9704282 ]
+
+################################################################################
+# Dev set
+# TfidfVectorizer(binary=True) - 100 000 words per lang
+# 0.6453148340380283
+# [0.59368086 0.53088275 0.96758294]
