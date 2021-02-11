@@ -1,23 +1,25 @@
 # Semi-Supervised Code-Switch Detection
 
-## Useful links
+The source code for research paper ***
 
-### Books
-
-https://web.stanford.edu/~jurafsky/slp3/edbook_oct162019.pdf
-
-### Dataset papers
-
-https://ritual.uh.edu/lince/datasets?fbclid=IwAR1qA9_JgJyBI5OphQEWaBHlSAsBen4_Aq9a4FYABbeMoQCVdbdQEzndUSQ
-
-### Tools
-https://www.wikidata.org/wiki/Wikidata:Tools/For_programmers
-
-### Cleaning
-
-https://machinelearningmastery.com/clean-text-machine-learning-python/
+## Requirements
+- Common Python 3 libraries
+```sh
+pip install emoji, beautifulsoup4, sklearn, pandas, numpy, matplotlib
+```
+- SpaCy library
+```sh
+pip install -U spacy
+```
 
 
-### Roadmap
+## How to run
+1. Create the dicionaries and train the models by running the folowing:
+	- ```python train_probability.py ```
+	- ```python train_ngrams_character.py ```
+	- ```python train_ngrams_word.py ```
+	- ```python train_viterbi_v1.py ```
+2. Do classification by running
+	- ```python code_switching_*.py <n> <evaluation-dataset>```
 
-https://ituniversity-my.sharepoint.com/:w:/r/personal/robv_itu_dk/_layouts/15/guestaccess.aspx?e=4%3ABwf6Vu&at=9&CID=3f41c6d8-1aee-a68b-9901-5bf1bbed2808&share=EbiMuFV0qDxNuYYbu0RjRg0B0f0qvbhxmPQyZDq-TI_Duw
+	Where `<n>` is the n-gram parameter
