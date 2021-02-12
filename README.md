@@ -5,8 +5,13 @@ The source code for research paper ***
 ## Requirements
 - Common Python 3 libraries
 ```sh
-pip install emoji bs4 sklearn pandas numpy matplotlib 
+pip install emoji regex bs4 sklearn pandas numpy matplotlib 
 ```
+- nltk library
+```sh
+pip install --user -U nltk
+```
+
 - SpaCy library
 ```sh
 pip install -U pip setuptools wheel
