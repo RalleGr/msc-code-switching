@@ -5,10 +5,12 @@ The source code for research paper ***
 ## Requirements
 - Common Python 3 libraries
 ```sh
-pip install emoji beautifulsoup4 sklearn pandas numpy matplotlib
+pip install emoji beautifulsoup4 sklearn pandas numpy matplotlib 
 ```
 - SpaCy library
 ```sh
+pip install -U pip setuptools wheel
+
 pip install -U spacy
 ```
 
