@@ -1,18 +1,23 @@
 from bs4 import BeautifulSoup
-from spacy.lang.en import English
-from spacy.lang.es import Spanish
-import os
 from tools.utils import write_dict
 from tools.utils import is_other
+from tools.utils import print_status
 import pandas as pd
+import spacy
+import os
+import importlib
+import sys
+from langs import langs
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
-def get_frequency_dict(lang):
+def get_frequency_dict(lang_code, lang_name):
+	print_status("Creating frequency dictionaries...")
+
 	frequency_dict = dict()
 
 	# Load data
-	for root, dirs, files in os.walk('datasets/monolingual-' + lang):
+	for root, dirs, files in os.walk('datasets/monolingual-' + lang_code):
 		if ('.DS_Store' in files):
 			files.remove('.DS_Store')
 		for f in files:
@@ -25,7 +30,8 @@ def get_frequency_dict(lang):
 			# Clean XML tags
 			cleantext = BeautifulSoup(text, "lxml").text
 
-			nlp = English() if lang is 'en' else Spanish()
+			module = importlib.import_module("spacy.lang." + lang_code)
+			nlp = getattr(module, lang_name)() if module is not None else spacy.language.Language()
 			tokenizer = nlp.Defaults.create_tokenizer(nlp)
 			tokens = list(tokenizer(cleantext))
 
@@ -39,10 +45,10 @@ def get_frequency_dict(lang):
 						frequency_dict[word] += 1
 					else:
 						frequency_dict[word] = 1
-
 	return frequency_dict
 
 def get_probability_dict(frequency_dict):
+	print_status("Creating probability dictionaries...")
 	smoothing_factor = 1
 	nr_of_tokens = sum(frequency_dict.values())
 	nr_of_distinct_words = len(frequency_dict.keys())
@@ -52,29 +58,44 @@ def get_probability_dict(frequency_dict):
 	probability_dict['OOV'] = smoothing_factor / (nr_of_tokens + smoothing_factor * nr_of_distinct_words)
 	return probability_dict
 
-# EN
 
-# Uncomment this to create a frequency dict from monolingual datasets
-# frequency_en_dict = get_frequency_dict('en')
+# Get language code from keyboard
+if len(sys.argv) == 1:
+	print("Please give two letter language codes as arg, for example es en")
+	exit(1)
 
-# Uncomment this to get existing frequency dict
-frequency_en_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_en.csv', encoding='utf-16')
-frequency_en_dict = frequency_en_df.set_index('word')['frequency'].to_dict()
+# Lang 1
+lang1 = sys.argv[1]
+lang1_code = langs()[lang1]['code']
+lang1_name = langs()[lang1]['name']
+
+# Lang 2
+lang2 = sys.argv[2]
+lang2_code = langs()[lang2]['code']
+lang2_name = langs()[lang2]['name']
+
+# If frequency dictionaries exist, read them, otherwise create them
+print_status('Getting dictionaries...')
+lang1_path = WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_' + lang1_code + '.csv'
+if (os.path.exists(lang1_path)):
+	frequency_lang1_df = pd.read_csv(lang1_path, encoding='utf-16')
+	frequency_lang1_dict = frequency_lang1_df.set_index('word')['frequency'].to_dict()
+else:
+	frequency_lang1_dict = get_frequency_dict(lang1_code, lang1_name)
+
+lang2_path = WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_' + lang2_code + '.csv'
+if (os.path.exists(lang2_path)):
+	frequency_lang2_df = pd.read_csv(lang2_path, encoding='utf-16')
+	frequency_lang2_dict = frequency_lang2_df.set_index('word')['frequency'].to_dict()
+else:
+	frequency_lang2_dict = get_frequency_dict(lang2_code, lang2_name)
 
 # Probability dict
-probability_dict_en = get_probability_dict(frequency_en_dict)
-write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_en_dict, 'frequency_dict_en', probability_dict_en, 'probability_dict_en')
+probability_lang1_dict = get_probability_dict(frequency_lang1_dict)
+write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_lang1_dict, 'frequency_dict_' + lang1_code, probability_lang1_dict, 'probability_dict_' + lang1_code)
 
-# ES
-# Uncomment this to get frequency dict from monolingual datasets
-# frequency_es_dict = get_frequency_dict('es')
+probability_lang2_dict = get_probability_dict(frequency_lang2_dict)
+write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_lang2_dict, 'frequency_dict_' + lang2_code, probability_lang2_dict, 'probability_dict_' + lang2_code)
 
-# Uncomment this to get existing frequency dict
-frequency_es_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_es.csv', encoding='utf-16')
-frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
-
-# Probability dict
-probability_dict_es = get_probability_dict(frequency_es_dict)
-write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_es_dict, 'frequency_dict_es', probability_dict_es, 'probability_dict_es')
-
+print_status('Done!')
 

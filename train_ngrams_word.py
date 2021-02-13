@@ -2,32 +2,30 @@ import pandas as pd
 from models.ngrams.word_ngrams import NGramModel
 from tools.utils import write_dict
 from tools.utils import is_other
+from tools.utils import print_status
+from langs import langs
 import os
 from bs4 import BeautifulSoup
 import re
-from tools.utils import print_status
-from spacy.lang.en import English
-from spacy.lang.es import Spanish
+import spacy
 import pickle
+import sys
+import importlib
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
-n = 3
-if n!=2 and n!=3:
-	print("n should be 2 or 3")
-	exit(1)
-
 # Split dataset by sentences, each sentence by tokens
-def get_tokenized_sentences(lang):
+def get_tokenized_sentences(lang_code, lang_name):
 	
 	tokenizedFile = []
 	# Initialize tokenizer
-	nlp = English() if lang is 'en' else Spanish()
+	module = importlib.util.find_spec(lang_code, package="spacy.lang")
+	nlp = getattr(spacy.lang, lang_name)() if module is not None else spacy.language.Language()
 	tokenizer = nlp.Defaults.create_tokenizer(nlp)
 
 	# Load data
 	print_status("Creating tokenized sentences from dataset...")
-	for root, dirs, files in os.walk('datasets/monolingual-' + lang):
+	for root, dirs, files in os.walk('datasets/monolingual-' + lang_code):
 		if ('.DS_Store' in files):
 			files.remove('.DS_Store')
 		for f in files:
@@ -56,23 +54,52 @@ def get_tokenized_sentences(lang):
 
 	return tokenizedFile
 
-# Write tokenized_sentences
-# tokenized_sentences_en = get_tokenized_sentences('en')
-# with open('./dictionaries/word-level/tokenized_sentences_en.p', 'wb') as fp:
-# 	pickle.dump(tokenized_sentences_en, fp)
+# Get language code from keyboard
+if len(sys.argv) == 1:
+	print("Please give two letter language codes as arg, for example es en")
+	print("Please give n value")
+	exit(1)
 
-# tokenized_sentences_es = get_tokenized_sentences('es')
-# with open('./dictionaries/word-level/tokenized_sentences_es.p', 'wb') as fp:
-# 	pickle.dump(tokenized_sentences_es, fp)
+# Lang 1
+lang1 = sys.argv[1]
+lang1_code = langs()[lang1]['code']
+lang1_name = langs()[lang1]['name']
 
-# Read tokenized_sentences and train n-gram model
-tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_en.p')
-tokenized_sentences_es = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_es.p')
+# Lang 2
+lang2 = sys.argv[2]
+lang2_code = langs()[lang2]['code']
+lang2_name = langs()[lang2]['name']
 
-model_en = NGramModel(n)
-model_en.train(tokenized_sentences_en)
-write_dict(WORD_LEVEL_DICTIONARIES_PATH, model_en.freq_dist, str(n) + '_grams_word_dict_en')
+# If tokenized sentences exist, read them, otherwise create them
+lang1_path = WORD_LEVEL_DICTIONARIES_PATH + 'tokenized_sentences_' + lang1_code + '.p'
+if (os.path.exists(lang1_path)):
+	tokenized_sentences_lang1 = pd.read_pickle(lang1_path)
+else:
+	tokenized_sentences_lang1 = get_tokenized_sentences(lang1_code, lang1_name)
+	with open(lang1_path, 'wb') as fp:
+		pickle.dump(tokenized_sentences_lang1, fp)
 
-model_es = NGramModel(n)
-model_es.train(tokenized_sentences_es)
-write_dict(WORD_LEVEL_DICTIONARIES_PATH, model_es.freq_dist, str(n) + '_grams_word_dict_es')
+lang2_path = WORD_LEVEL_DICTIONARIES_PATH + 'tokenized_sentences_' + lang2_code + '.p'
+if (os.path.exists(lang2_path)):
+	tokenized_sentences_lang2 = pd.read_pickle(lang2_path)
+else:
+	tokenized_sentences_lang2 = get_tokenized_sentences(lang2_code, lang2_name)
+	with open(lang2_path, 'wb') as fp:
+		pickle.dump(tokenized_sentences_lang2, fp)
+
+# Train n gram model
+ns = [
+	2,
+	3,
+]
+for n in ns:
+	print_status('Training word ngrams model... n=' + str(n))
+	model_lang1 = NGramModel(n)
+	model_lang1.train(tokenized_sentences_lang1)
+	write_dict(WORD_LEVEL_DICTIONARIES_PATH, model_lang1.freq_dist, str(n) + '_grams_word_dict_' + lang1_code)
+
+	model_lang2 = NGramModel(n)
+	model_lang2.train(tokenized_sentences_lang2)
+	write_dict(WORD_LEVEL_DICTIONARIES_PATH, model_lang2.freq_dist, str(n) + '_grams_word_dict_' + lang2_code)
+
+print_status('Done!')

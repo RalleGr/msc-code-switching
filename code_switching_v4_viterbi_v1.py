@@ -26,6 +26,7 @@ en = 'en'
 es = 'es'
 
 # Language model files.
+print_status("Getting dictionaries...")
 ngram = 2
 en_lm = VITERBI_DICTIONARIES_PATH + str(ngram) + '-gram-en.lm'
 es_lm = VITERBI_DICTIONARIES_PATH + str(ngram) + '-gram-es.lm'
