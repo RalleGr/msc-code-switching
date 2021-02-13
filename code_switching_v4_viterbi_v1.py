@@ -8,6 +8,7 @@ from sklearn.metrics import ConfusionMatrixDisplay
 from sklearn.metrics import confusion_matrix
 import matplotlib.pyplot as plt
 import sys
+import os
 
 # Based on eginhard’s implementation (Source: https://github.com/eginhard/word-level-language-id)
 # This version was used as final model
@@ -15,38 +16,39 @@ import sys
 WORD_DICTIONARIES_PATH = "./dictionaries/word-level/"
 VITERBI_DICTIONARIES_PATH = "./dictionaries/viterbi/"
 
-# Get evaluation dataset from keyboard
+# Get language codes and evaluation dataset from keyboard
 if len(sys.argv) == 1:
+	print("Please give two letter language codes as arg, for example en es")
 	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
 	exit(1)
-evaluation_dataset = sys.argv[1]
-
-# Language codes
-en = 'en'
-es = 'es'
+lang1_code = sys.argv[1]
+lang2_code = sys.argv[2]
+evaluation_dataset = sys.argv[3]
 
 # Language model files.
 print_status("Getting dictionaries...")
 ngram = 2
-en_lm = VITERBI_DICTIONARIES_PATH + str(ngram) + '-gram-en.lm'
-es_lm = VITERBI_DICTIONARIES_PATH + str(ngram) + '-gram-es.lm'
+lang1_path = VITERBI_DICTIONARIES_PATH + str(ngram) + '-gram-' + lang1_code + '.lm'
+lang2_path = VITERBI_DICTIONARIES_PATH + str(ngram) + '-gram-' + lang2_code + '.lm'
+if (os.path.exists(lang1_path) and os.path.exists(lang2_path)):
+	# Unigram frequency lexicons.
+	lang1_lex = WORD_DICTIONARIES_PATH + 'frequency_dict_en.csv'
+	lang2_lex = WORD_DICTIONARIES_PATH + 'frequency_dict_es.csv'
+else:
+	print("Please run: python train_viterbi.py " + lang1_code + " " + lang2_code)
 
-# Unigram frequency lexicons.
-en_lex = WORD_DICTIONARIES_PATH + 'frequency_dict_en.csv'
-es_lex = WORD_DICTIONARIES_PATH + 'frequency_dict_es.csv'
-
-identifier = ViterbiIdentifier(en, es,
-								en_lm, es_lm,
-								en_lex, es_lex)
+identifier = ViterbiIdentifier(lang1_code, lang2_code,
+								lang1_path, lang2_path,
+								lang1_lex, lang2_lex)
 
 # Get data
 print_status("Getting test data...")
 if (evaluation_dataset == 'dev'):
-	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/dev.conll' # validation
 if (evaluation_dataset == 'test'):
-	filepath = './datasets/bilingual-annotated/test.conll' # test
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test.conll' # test
 if (evaluation_dataset == 'test-original'):
-	filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test-original.conll' # original test set from LinCE
 
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
@@ -110,7 +112,7 @@ for tokens in sentences:
 		y.append(y_sentence)
 
 if (evaluation_dataset == 'test-original'):
-	save_predictions(y, './results/predictions/predictions_test_original_viterbi_v1.txt')
+	save_predictions(y, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_original_viterbi_v1.txt')
 	exit(1)
 
 # Own test set with labels
@@ -137,9 +139,9 @@ plt.savefig('./results/CM/confusion_matrix_' + 'viterbi_v1.svg', format='svg')
 
 # Save model output
 if (evaluation_dataset == 'dev'):
-	save_predictions(predictions_dict, './results/predictions/predictions_val_viterbi_v1.txt')
+	save_predictions(predictions_dict, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_val_viterbi_v1.txt')
 if (evaluation_dataset == 'test'):
-	save_predictions(predictions_dict, './results/predictions/predictions_test_viterbi_v1.txt')
+	save_predictions(predictions_dict, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_viterbi_v1.txt')
 
 # RESULTS
 # Validation set

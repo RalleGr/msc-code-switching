@@ -61,7 +61,7 @@ def get_probability_dict(frequency_dict):
 
 # Get language code from keyboard
 if len(sys.argv) == 1:
-	print("Please give two letter language codes as arg, for example es en")
+	print("Please give two letter language codes as arg, for example en es")
 	exit(1)
 
 # Lang 1

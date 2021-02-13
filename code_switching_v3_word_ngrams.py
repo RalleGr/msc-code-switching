@@ -10,46 +10,53 @@ from tools.utils import is_other
 from tools.utils import print_status
 from tools.utils import save_predictions
 import sys
+import os
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
-# Get n value and evaluation dataset from keyboard
+# Get language codes, evaluation dataset and n from keyboard
 if len(sys.argv) == 1:
-	print("Please enter n value for n-grams")
+	print("Please give two letter language codes as arg, for example en es")
 	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
+	print("Please enter n value")
 	exit(1)
-
-n = int(sys.argv[1])
+lang1_code = sys.argv[1]
+lang2_code = sys.argv[2]
+evaluation_dataset = sys.argv[3]
+n = int(sys.argv[4])
 if n!=2 and n!=3:
 	print("n should be 2 or 3")
 	exit(1)
 
-evaluation_dataset = sys.argv[2]
-
 # Get dictionaries
 print_status("Getting dictionaries...")
-frequency_en_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_word_dict_en.csv', encoding='utf-16', converters={"word": ast.literal_eval})
-frequency_en_dict = frequency_en_df.set_index('word')['frequency'].to_dict()
+lang1_path = WORD_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_word_dict_' + lang1_code + '.csv'
+lang2_path = WORD_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_word_dict_' + lang2_code + '.csv'
+if (os.path.exists(lang1_path) and os.path.exists(lang2_path)):
+	frequency_lang1_df = pd.read_csv(lang1_path, encoding='utf-16', converters={"word": ast.literal_eval})
+	frequency_lang1_dict = frequency_lang1_df.set_index('word')['frequency'].to_dict()
 
-frequency_es_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + str(n) + '_grams_word_dict_es.csv', encoding='utf-16', converters={"word": ast.literal_eval})
-frequency_es_dict = frequency_es_df.set_index('word')['frequency'].to_dict()
+	frequency_lang2_df = pd.read_csv(lang2_path, encoding='utf-16', converters={"word": ast.literal_eval})
+	frequency_lang2_dict = frequency_lang2_df.set_index('word')['frequency'].to_dict()
+else:
+	print("Please run: python train_ngrams_word.py " + lang1_code + " " + lang2_code + " " + n)
 
 # Apply ngram model to en, es and other
 print_status("Applying NGRAM model...")
-model_en = NGramModel(n)
-model_en.load_ngrams_freq(frequency_en_dict)
+model_lang1 = NGramModel(n)
+model_lang1.load_ngrams_freq(frequency_lang1_dict)
 
-model_es = NGramModel(n)
-model_es.load_ngrams_freq(frequency_es_dict)
+model_lang2 = NGramModel(n)
+model_lang2.load_ngrams_freq(frequency_lang2_dict)
 
 # Get data
 print_status("Getting test data...")
 if (evaluation_dataset == 'dev'):
-	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/dev.conll' # validation
 if (evaluation_dataset == 'test'):
-	filepath = './datasets/bilingual-annotated/test.conll' # test
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test.conll' # test
 if (evaluation_dataset == 'test-original'):
-	filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test-original.conll' # original test set from LinCE
 
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
@@ -95,9 +102,9 @@ for s in sentences:
 		if is_other(s[word_index]):
 			lang = 'other'
 		else:
-			prob_en = model_en.get_word_log_prob(s, word_index)
-			prob_es = model_es.get_word_log_prob(s, word_index)
-			if (prob_en >= prob_es):
+			prob_lang1 = model_lang1.get_word_log_prob(s, word_index)
+			prob_lang2 = model_lang2.get_word_log_prob(s, word_index)
+			if (prob_lang1 >= prob_lang2):
 				lang = 'lang1'
 			else:
 				lang = 'lang2'
@@ -112,7 +119,7 @@ for s in sentences:
 		y.append('')
 
 if (evaluation_dataset == 'test-original'):
-	save_predictions(y, './results/predictions/predictions_test_original_word_' + str(n) + '_grams.txt')
+	save_predictions(y, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_original_word_' + str(n) + '_grams.txt')
 	exit(1)
 
 # Get accuracy
@@ -135,9 +142,9 @@ plt.savefig('./results/CM/confusion_matrix_' + str(n) + '_grams_words.svg',forma
 
 # Save model output
 if (evaluation_dataset == 'dev'):
-	save_predictions(predictions_dict, './results/predictions/predictions_val_word_' + str(n) + '_grams.txt')
+	save_predictions(predictions_dict, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_val_word_' + str(n) + '_grams.txt')
 if (evaluation_dataset == 'test'):
-	save_predictions(predictions_dict, './results/predictions/predictions_test_word_' + str(n) + '_grams.txt')
+	save_predictions(predictions_dict, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_word_' + str(n) + '_grams.txt')
 
 # RESULTS
 # Validation set
@@ -162,6 +169,6 @@ if (evaluation_dataset == 'test'):
 ##################### RESULTS FOR WORKSHOP ################################
 # Dev set
 # bigrams
-# Accuracy: 0.5092285490037218
-# F1 score per class: [0.45413354 0.31975212 0.96758294]
-# Weighted F1 score: 0.505039548429604
+# Accuracy: 0.5035572321948503
+# F1 score per class: [0.44502993 0.3159646  0.96758294]
+# Weighted F1 score: 0.4997535295609069

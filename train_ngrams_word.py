@@ -56,7 +56,7 @@ def get_tokenized_sentences(lang_code, lang_name):
 
 # Get language code from keyboard
 if len(sys.argv) == 1:
-	print("Please give two letter language codes as arg, for example es en")
+	print("Please give two letter language codes as arg, for example en es")
 	print("Please give n value")
 	exit(1)
 

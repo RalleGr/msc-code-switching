@@ -10,14 +10,18 @@ from tools.utils import merge_dictionaries
 from tools.utils import save_predictions
 import math
 import sys
+import os
 
 # Based on own implementation
 
-# Get evaluation dataset from keyboard
+# Get language codes and evaluation dataset from keyboard
 if len(sys.argv) == 1:
+	print("Please give two letter language codes as arg, for example en es")
 	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
 	exit(1)
-evaluation_dataset = sys.argv[1]
+lang1_code = sys.argv[1]
+lang2_code = sys.argv[2]
+evaluation_dataset = sys.argv[3]
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
@@ -82,25 +86,30 @@ transition_probabilities = {
 
 # Emission probabilities (our probability dictionaries)
 print_status("Getting dictionaries...")
-probability_en_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_en.csv', encoding='utf-16')
-probability_en_dict = probability_en_df.set_index('word')['probability'].to_dict()
+lang1_path = WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_' + lang1_code + '.csv'
+lang2_path = WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_' + lang2_code + '.csv'
+if (os.path.exists(lang1_path) and os.path.exists(lang2_path)):
+	probability_lang1_df = pd.read_csv(lang1_path, encoding='utf-16')
+	probability_lang1_dict = probability_lang1_df.set_index('word')['probability'].to_dict()
 
-probability_es_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_es.csv', encoding='utf-16')
-probability_es_dict = probability_es_df.set_index('word')['probability'].to_dict()
-print_status("Dictionaries ready!")
+	probability_lang2_df = pd.read_csv(lang2_path, encoding='utf-16')
+	probability_lang2_dict = probability_lang2_df.set_index('word')['probability'].to_dict()
+	print_status("Dictionaries ready!")
+else:
+	print("Please run: python train_probability.py " + lang1_code + " " + lang2_code)
 
-data_en = {'lang1': probability_en_dict}
-data_es = {'lang2': probability_es_dict}
+data_en = {'lang1': probability_lang1_dict}
+data_es = {'lang2': probability_lang2_dict}
 emission_probabilities = merge_dictionaries(data_en, data_es)
 
 # Get data
 print_status("Getting test data...")
 if (evaluation_dataset == 'dev'):
-	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/dev.conll' # validation
 if (evaluation_dataset == 'test'):
-	filepath = './datasets/bilingual-annotated/test.conll' # test
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test.conll' # test
 if (evaluation_dataset == 'test-original'):
-	filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test-original.conll' # original test set from LinCE
 
 file = open(filepath, 'rt', encoding='utf8')
 sentences = []
@@ -163,7 +172,7 @@ for tokens in sentences:
 		y.append(y_sentence)
 
 if (evaluation_dataset == 'test-original'):
-	save_predictions(y, './results/predictions/predictions_test_original_viterbi_v2.txt')
+	save_predictions(y, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_original_viterbi_v2.txt')
 	exit(1)
 
 # Flatten y list
@@ -189,9 +198,9 @@ plt.savefig('./results/CM/confusion_matrix_' + 'viterbi_v2.svg', format='svg')
 
 # Save model output
 if (evaluation_dataset == 'dev'):
-	save_predictions(predictions_dict, './results/predictions/predictions_val_viterbi_v2.txt')
+	save_predictions(predictions_dict, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_val_viterbi_v2.txt')
 if (evaluation_dataset == 'test'):
-	save_predictions(predictions_dict, './results/predictions/predictions_test_viterbi_v2.txt')
+	save_predictions(predictions_dict, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_viterbi_v2.txt')
 
 # RESULTS
 # Validation set

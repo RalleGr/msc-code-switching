@@ -11,7 +11,7 @@ CHAR_LEVEL_DICTIONARIES_PATH = "./dictionaries/character-level/"
 
 # Get language code from keyboard
 if len(sys.argv) == 1:
-	print("Please give two letter language codes as arg, for example es en")
+	print("Please give two letter language codes as arg, for example en es")
 	print("Please give n value")
 	exit(1)
 
