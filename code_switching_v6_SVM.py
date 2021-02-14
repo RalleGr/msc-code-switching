@@ -11,26 +11,36 @@ from sklearn.svm import SVC
 from sklearn.svm import LinearSVC
 import pandas as pd
 import sys
+import os
 
-# Get evaluation dataset from keyboard
+# Get language codes and evaluation dataset from keyboard
 if len(sys.argv) == 1:
+	print("Please give two letter language codes as arg, for example en es")
 	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
 	exit(1)
-evaluation_dataset = sys.argv[1]
+lang1_code = sys.argv[1]
+lang2_code = sys.argv[2]
+evaluation_dataset = sys.argv[3]
 
 # Get training dictionaries
 print_status("Getting tokenized sentences...")
-tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_en.p')
-tokenized_sentences_es = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_es.p')
+lang1_path_tokenized = './dictionaries/word-level/tokenized_sentences_' + lang1_code + '.p'
+lang2_path_tokenized = './dictionaries/word-level/tokenized_sentences_' + lang2_code + '.p'
+
+if (os.path.exists(lang1_path_tokenized) and os.path.exists(lang2_path_tokenized)):
+	tokenized_sentences_lang1 = pd.read_pickle(lang1_path_tokenized)
+	tokenized_sentences_lang2 = pd.read_pickle(lang2_path_tokenized)
+else:
+	print("Please run: python train_ngrams_word.py " + lang1_code + " " + lang2_code + " 2")
 
 # Flatten lists, so we have a long array of strings (words)
-tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:100000]
-tokenized_sentences_es = [item for sent in tokenized_sentences_es for item in sent][:100000]
-X_train = tokenized_sentences_en + tokenized_sentences_es
+tokenized_sentences_lang1 = [item for sent in tokenized_sentences_lang1 for item in sent][:100000]
+tokenized_sentences_lang2 = [item for sent in tokenized_sentences_lang2 for item in sent][:100000]
+X_train = tokenized_sentences_lang1 + tokenized_sentences_lang2
 
-t_train_en = ['lang1' for token in tokenized_sentences_en]
-t_train_es = ['lang2' for token in tokenized_sentences_es]
-t_train = t_train_en + t_train_es
+t_train_lang1 = ['lang1' for token in tokenized_sentences_lang1]
+t_train_lang2 = ['lang2' for token in tokenized_sentences_lang2]
+t_train = t_train_lang1 + t_train_lang2
 
 # Convert a collection of text documents to a matrix of token counts
 print_status("Counting ngrams...")
@@ -44,14 +54,14 @@ print_status("Training SVM...")
 svm = SVC(random_state=123)
 svm.fit(vectorized_data, t_train)
 
-# Get test data
+# Get data
 print_status("Getting test data...")
 if (evaluation_dataset == 'dev'):
-	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/dev.conll' # validation
 if (evaluation_dataset == 'test'):
-	filepath = './datasets/bilingual-annotated/test.conll' # test
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test.conll' # test
 if (evaluation_dataset == 'test-original'):
-	filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test-original.conll' # original test set from LinCE
 
 file = open(filepath, 'rt', encoding='utf8')
 words = []
@@ -97,7 +107,7 @@ for word in words:
 		y.append('')
 
 if (evaluation_dataset == 'test-original'):
-	save_predictions(y, './results/predictions/predictions_test_original_SVM.txt')
+	save_predictions(y, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_original_SVM.txt')
 	exit(1)
 
 # Get accuracy
@@ -121,9 +131,9 @@ plt.savefig('./results/CM/confusion_matrix_SVM.svg', format='svg')
 
 # Save model output
 if (evaluation_dataset == 'dev'):
-	save_predictions(predictions_dict, './results/predictions/predictions_val_SVM.txt')
+	save_predictions(predictions_dict, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_val_SVM.txt')
 if (evaluation_dataset == 'test'):
-	save_predictions(predictions_dict, './results/predictions/predictions_test_SVM.txt')
+	save_predictions(predictions_dict, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_SVM.txt')
 
 
 # RESULTS

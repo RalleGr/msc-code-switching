@@ -12,13 +12,16 @@ from sklearn.metrics import confusion_matrix
 import itertools
 import sys
 
-PREDICTIONS_PATH = './results/predictions/'
-
-# Get evaluation dataset from keyboard
+# Get language codes and evaluation dataset from keyboard
 if len(sys.argv) == 1:
+	print("Please give two letter language codes as arg, for example en es")
 	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
 	exit(1)
-evaluation_dataset = sys.argv[1]
+lang1_code = sys.argv[1]
+lang2_code = sys.argv[2]
+evaluation_dataset = sys.argv[3]
+
+PREDICTIONS_PATH = './results/predictions/' + lang1_code + '-' + lang2_code + '/'
 
 # Get predictions data
 print_status("Getting predictions data...")
@@ -56,14 +59,14 @@ if (evaluation_dataset == 'test-original'):
 # perms = list(itertools.permutations(predictionsFileNames, r=5))
 perms = [predictionsFileNames]
 
-# Get test data
+# Get data
 print_status("Getting test data...")
 if (evaluation_dataset == 'dev'):
-	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/dev.conll' # validation
 if (evaluation_dataset == 'test'):
-	filepath = './datasets/bilingual-annotated/test.conll' # test
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test.conll' # test
 if (evaluation_dataset == 'test-original'):
-	filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test-original.conll' # original test set from LinCE
 
 file = open(filepath, 'rt', encoding='utf8')
 words = []
@@ -162,7 +165,7 @@ for perm in perms:
 print(best_ensembly)
 
 if (evaluation_dataset == 'test-original'):
-	save_predictions(best_predictions, './results/predictions/predictions_test_original_ensemble_all.txt')
+	save_predictions(best_predictions, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_original_ensemble_all.txt')
 	exit(1)
 
 # Get accuracy

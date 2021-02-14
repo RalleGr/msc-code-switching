@@ -38,11 +38,9 @@ file.close()
 # Get test data
 print_status("Getting test data...")
 if (evaluation_dataset == 'dev'):
-	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+	filepath = './datasets/bilingual-annotated/en-es/dev.conll' # validation
 if (evaluation_dataset == 'test'):
-	filepath = './datasets/bilingual-annotated/test.conll' # test
-if (evaluation_dataset == 'test-original'):
-	filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+	filepath = './datasets/bilingual-annotated/en-es/test.conll' # test
 
 file = open(filepath, 'rt', encoding='utf8')
 t = []
@@ -68,7 +66,7 @@ for i in range(len(t)):
 		y_.append(pred)
 
 if (evaluation_dataset == 'test-original'):
-	save_predictions(y_, './results/predictions/predictions_test_original_mBERT.txt')
+	save_predictions(y_, './results/predictions/en-es/predictions_test_original_mBERT.txt')
 	exit(1)
 # Get accuracy
 acc = accuracy_score(t_, y_)

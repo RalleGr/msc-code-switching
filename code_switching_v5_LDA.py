@@ -11,43 +11,59 @@ from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.decomposition import LatentDirichletAllocation as LDA
 import pandas as pd
 import sys
+import os
 
 # sources: https://towardsdatascience.com/end-to-end-topic-modeling-in-python-latent-dirichlet-allocation-lda-35ce4ed6b3e0
 # https://github.com/kapadias/mediumposts/blob/master/nlp/published_notebooks/Introduction%20to%20Topic%20Modeling.ipynb
 
 WORD_LEVEL_DICTIONARIES_PATH = "./dictionaries/word-level/"
 
-# Get evaluation dataset from keyboard
+# Get language codes and evaluation dataset from keyboard
 if len(sys.argv) == 1:
+	print("Please give two letter language codes as arg, for example en es")
 	print("Please enter evaluation dataset: 'dev', 'test' or 'test-original'")
 	exit(1)
-evaluation_dataset = sys.argv[1]
+lang1_code = sys.argv[1]
+lang2_code = sys.argv[2]
+evaluation_dataset = sys.argv[3]
 
 print_status("Getting dictionaries...")
-probability_en_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_en.csv', encoding='utf-16')
-probability_en_dict = probability_en_df.set_index('word')['probability'].to_dict()
+lang1_path = WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_' + lang1_code + '.csv'
+lang2_path = WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_' + lang2_code + '.csv'
+if (os.path.exists(lang1_path) and os.path.exists(lang2_path)):
+	probability_lang1_df = pd.read_csv(lang1_path, encoding='utf-16')
+	probability_lang1_dict = probability_lang1_df.set_index('word')['probability'].to_dict()
 
-probability_es_df = pd.read_csv(WORD_LEVEL_DICTIONARIES_PATH + 'probability_dict_es.csv', encoding='utf-16')
-probability_es_dict = probability_es_df.set_index('word')['probability'].to_dict()
+	probability_lang2_df = pd.read_csv(lang2_path, encoding='utf-16')
+	probability_lang2_dict = probability_lang2_df.set_index('word')['probability'].to_dict()
+	print_status("Dictionaries ready!")
+else:
+	print("Please run: python train_probability.py " + lang1_code + " " + lang2_code)
 
 # Get training dictionaries
 print_status("Getting tokenized sentences...")
-tokenized_sentences_en = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_en.p')
-tokenized_sentences_es = pd.read_pickle(r'./dictionaries/word-level/tokenized_sentences_es.p')
+lang1_path_tokenized = './dictionaries/word-level/tokenized_sentences_' + lang1_code + '.p'
+lang2_path_tokenized = './dictionaries/word-level/tokenized_sentences_' + lang2_code + '.p'
+
+if (os.path.exists(lang1_path_tokenized) and os.path.exists(lang2_path_tokenized)):
+	tokenized_sentences_lang1 = pd.read_pickle(lang1_path_tokenized)
+	tokenized_sentences_lang2 = pd.read_pickle(lang2_path_tokenized)
+else:
+	print("Please run: python train_ngrams_word.py " + lang1_code + " " + lang2_code + " 2")
 
 # Flatten lists, so we have a long array of strings (words)
-tokenized_sentences_en = [item for sent in tokenized_sentences_en for item in sent][:100000]
-tokenized_sentences_es = [item for sent in tokenized_sentences_es for item in sent][:100000]
-X_train = tokenized_sentences_en + tokenized_sentences_es
+tokenized_sentences_lang1 = [item for sent in tokenized_sentences_lang1 for item in sent][:100000]
+tokenized_sentences_lang2 = [item for sent in tokenized_sentences_lang2 for item in sent][:100000]
+X_train = tokenized_sentences_lang1 + tokenized_sentences_lang2
 
 # Get data
 print_status("Getting test data...")
 if (evaluation_dataset == 'dev'):
-	filepath = './datasets/bilingual-annotated/dev.conll' # validation
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/dev.conll' # validation
 if (evaluation_dataset == 'test'):
-	filepath = './datasets/bilingual-annotated/test.conll' # test
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test.conll' # test
 if (evaluation_dataset == 'test-original'):
-	filepath = './datasets/bilingual-annotated/test-original.conll' # original test set from LinCE
+	filepath = './datasets/bilingual-annotated/' + lang1_code + '-' + lang2_code + '/test-original.conll' # original test set from LinCE
 
 file = open(filepath, 'rt', encoding='utf8')
 words = []
@@ -113,16 +129,16 @@ count_lang2 = 0
 for i in top_n_words_c0_idx:
 	word = words_not_other[i]
 
-	# Get EN prob
-	if word in probability_en_dict: prob_en = probability_en_dict[word]
-	else: prob_en = probability_en_dict['OOV']
+	# Get lang1 prob
+	if word in probability_lang1_dict: prob_lang1 = probability_lang1_dict[word]
+	else: prob_lang1 = probability_lang1_dict['OOV']
 
-	# Get ES prob
-	if word in probability_es_dict: prob_es = probability_es_dict[word]
-	else: prob_es = probability_es_dict['OOV']
+	# Get lang2 prob
+	if word in probability_lang2_dict: prob_lang2 = probability_lang2_dict[word]
+	else: prob_lang2 = probability_lang2_dict['OOV']
 
 	# Assign class based on regex or class with highest prob
-	if (prob_en >= prob_es):
+	if (prob_lang1 >= prob_lang2):
 		count_lang1 += 1
 	else:
 		count_lang2 += 1
@@ -158,7 +174,7 @@ for word in words:
 		y.append('')
 
 if (evaluation_dataset == 'test-original'):
-	save_predictions(y, './results/predictions/predictions_test_original_LDA.txt')
+	save_predictions(y, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_original_LDA.txt')
 	exit(1)
 
 # Get accuracy
@@ -181,9 +197,9 @@ plt.savefig('./results/CM/confusion_matrix_LDA.svg', format='svg')
 
 # Save model output
 if (evaluation_dataset == 'dev'):
-	save_predictions(predictions_dict, './results/predictions/predictions_val_LDA.txt')
+	save_predictions(predictions_dict, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_val_LDA.txt')
 if (evaluation_dataset == 'test'):
-	save_predictions(predictions_dict, './results/predictions/predictions_test_LDA.txt')
+	save_predictions(predictions_dict, './results/predictions/' + lang1_code + '-' + lang2_code + '/predictions_test_LDA.txt')
 
 # RESULTS
 

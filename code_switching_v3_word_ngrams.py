@@ -169,6 +169,6 @@ if (evaluation_dataset == 'test'):
 ##################### RESULTS FOR WORKSHOP ################################
 # Dev set
 # bigrams
-# Accuracy: 0.5035572321948503
-# F1 score per class: [0.44502993 0.3159646  0.96758294]
-# Weighted F1 score: 0.4997535295609069
+# Accuracy: 0.5092285490037218
+# F1 score per class: [0.45413354 0.31975212 0.96758294]
+# Weighted F1 score: 0.505039548429604

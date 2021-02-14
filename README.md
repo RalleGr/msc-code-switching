@@ -5,17 +5,24 @@ The source code for research paper ***
 ## Requirements
 - Common Python 3 libraries
 ```sh
-pip install emoji, beautifulsoup4, sklearn, pandas, numpy, matplotlib
+pip install emoji regex bs4 sklearn pandas numpy matplotlib 
 ```
+- nltk library
+```sh
+pip install --user -U nltk
+```
+
 - SpaCy library
 ```sh
+pip install -U pip setuptools wheel
+
 pip install -U spacy
 ```
 
 ## Usage
 1. Add language two-letter code (```<lang>```) and name in the ```langs.py```
 2. Add training monolingual data in ```datasets``` folder with the name ```monolingual-<lang>```
-3. Create frequency/probability dicionaries and train the models by running the folowing:
+3. Create frequency/probability dictionaries and train the models by running the folowing:
 	- ```python train_probability.py <lang1> <lang2>```
 	- ```python train_ngrams_character.py <lang1> <lang2>```
 	- ```python train_ngrams_word.py <lang1> <lang2>```

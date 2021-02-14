@@ -19,8 +19,8 @@ def get_tokenized_sentences(lang_code, lang_name):
 	
 	tokenizedFile = []
 	# Initialize tokenizer
-	module = importlib.util.find_spec(lang_code, package="spacy.lang")
-	nlp = getattr(spacy.lang, lang_name)() if module is not None else spacy.language.Language()
+	module = importlib.import_module("spacy.lang." + lang_code)
+	nlp = getattr(module, lang_name)() if module is not None else spacy.language.Language()
 	tokenizer = nlp.Defaults.create_tokenizer(nlp)
 
 	# Load data
