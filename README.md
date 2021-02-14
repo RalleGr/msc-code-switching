@@ -20,13 +20,18 @@ pip install -U spacy
 ```
 
 ## Usage
-1. Add language two-letter code (```<lang>```) and name in the ```langs.py```
-2. Add training monolingual data in ```datasets``` folder with the name ```monolingual-<lang>```
-3. Create frequency/probability dictionaries and train the models by running the folowing:
+1. Create frequency/probability dictionaries and train the models by running the folowing:
 	- ```python train_probability.py <lang1> <lang2>```
 	- ```python train_ngrams_character.py <lang1> <lang2>```
 	- ```python train_ngrams_word.py <lang1> <lang2>```
 	- ```python train_viterbi_v1.py <lang1> <lang2>```
-4. Do classification by running
-	- ```python code_switching_*.py <evaluation-dataset>```
-	- ```python code_switching_*.py <n> <evaluation-dataset> for word and character n-grams```
+2. Do classification by running
+	- ```python code_switching_*.py <lang1> <lang2> <evaluation-dataset>```
+	- ```python code_switching_*_ngrams.py <lang1> <lang2> <evaluation-dataset> <n> for word and character n-grams```
+
+## Adding a new language pair
+1. Add the two-letter code and name of the language ```langs.py``` (https://en.wikipedia.org/wiki/List_of_ISO_639-1_codes), for each new language
+2. Add training monolingual data in ```datasets``` folder with the name ```monolingual-<lang>```, for each new language
+3. Add test bilingual data in ```datasets/bilingual-annotated``` folder with the name  ```<lang1>-<lang2>```
+4. Create an empty folder in ```results/predictions``` folder with the name ```<lang1>-<lang2>```
+5. Train and test the models
