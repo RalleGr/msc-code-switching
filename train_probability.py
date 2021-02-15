@@ -62,6 +62,7 @@ def get_probability_dict(frequency_dict):
 # Get language code from keyboard
 if len(sys.argv) == 1:
 	print("Please give two letter language codes as arg, for example en es")
+	print("Get only frequency dictionaries, give frequency arg. Get both frequency and probability, give probability arg")
 	exit(1)
 
 # Lang 1
@@ -74,28 +75,24 @@ lang2 = sys.argv[2]
 lang2_code = langs()[lang2]['code']
 lang2_name = langs()[lang2]['name']
 
-# If frequency dictionaries exist, read them, otherwise create them
-print_status('Getting dictionaries...')
-lang1_path = WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_' + lang1_code + '.csv'
-if (os.path.exists(lang1_path)):
-	frequency_lang1_df = pd.read_csv(lang1_path, encoding='utf-16')
-	frequency_lang1_dict = frequency_lang1_df.set_index('word')['frequency'].to_dict()
-else:
-	frequency_lang1_dict = get_frequency_dict(lang1_code, lang1_name)
+# Frequency
+fullTraining = sys.argv[3] == 'probability'
 
-lang2_path = WORD_LEVEL_DICTIONARIES_PATH + 'frequency_dict_' + lang2_code + '.csv'
-if (os.path.exists(lang2_path)):
-	frequency_lang2_df = pd.read_csv(lang2_path, encoding='utf-16')
-	frequency_lang2_dict = frequency_lang2_df.set_index('word')['frequency'].to_dict()
-else:
-	frequency_lang2_dict = get_frequency_dict(lang2_code, lang2_name)
+# If create frequency dictionaries
+frequency_lang1_dict = get_frequency_dict(lang1_code, lang1_name)
+frequency_lang2_dict = get_frequency_dict(lang2_code, lang2_name)
 
 # Probability dict
 probability_lang1_dict = get_probability_dict(frequency_lang1_dict)
-write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_lang1_dict, 'frequency_dict_' + lang1_code, probability_lang1_dict, 'probability_dict_' + lang1_code)
+if (fullTraining):
+	write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_lang1_dict, 'frequency_dict_' + lang1_code, probability_lang1_dict, 'probability_dict_' + lang1_code)
+else:
+	write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_lang1_dict, 'frequency_dict_' + lang1_code)
 
 probability_lang2_dict = get_probability_dict(frequency_lang2_dict)
-write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_lang2_dict, 'frequency_dict_' + lang2_code, probability_lang2_dict, 'probability_dict_' + lang2_code)
-
+if (fullTraining):
+	write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_lang2_dict, 'frequency_dict_' + lang2_code, probability_lang2_dict, 'probability_dict_' + lang2_code)
+else:
+	write_dict(WORD_LEVEL_DICTIONARIES_PATH, frequency_lang2_dict, 'frequency_dict_' + lang2_code)
 print_status('Done!')
 

@@ -21,7 +21,7 @@ pip install -U spacy
 
 ## Usage
 1. Create frequency/probability dictionaries and train the models by running the folowing:
-	- ```python train_probability.py <lang1> <lang2>```
+	- ```python train_probability.py <lang1> <lang2> <'frequency' or 'probability'>```
 	- ```python train_ngrams_character.py <lang1> <lang2>```
 	- ```python train_ngrams_word.py <lang1> <lang2>```
 	- ```python train_viterbi_v1.py <lang1> <lang2>```
