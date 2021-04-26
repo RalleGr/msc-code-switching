@@ -1,6 +1,6 @@
 # Semi-Supervised Code-Switch Detection
 
-The source code for research paper ***
+The source code for research paper 'Much Gracias: Semi-supervised Code-switch Detection forSpanish-English: How far can we get?' by Dana-Maria Iliescu & Rasmus Grand & Sara Qirko & Rob van der Goot - IT-University of Copenhagen - April 2021
 
 ## Requirements
 - Common Python 3 libraries
