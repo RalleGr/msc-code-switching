@@ -16,7 +16,7 @@ pip install --user -U nltk
 ```sh
 pip install -U pip setuptools wheel
 
-pip install -U spacy
+pip install -U spacy=2.3.2
 ```
 
 ## Usage
